@@ -1,0 +1,418 @@
+/* Interface do app. A lógica testável mora em nucleo.js. Dados ficam só no aparelho (localStorage). */
+(function () {
+  'use strict';
+  var TB = window.TB, $app = document.getElementById('app'), $cam = document.getElementById('camada');
+  var CHAVE = 'treino-bernardo-v1', FCMAX = 190;
+  var IC = {
+    ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+    no: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"/></svg>',
+    info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>',
+    x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    voltar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>'
+  };
+
+  /* ---------- estado salvo ---------- */
+  function carregar() {
+    try { var s = JSON.parse(localStorage.getItem(CHAVE)); if (s && s.v === 1) return s; } catch (e) {}
+    return { v: 1, checks: {}, reg: {}, dias: {}, perfil: {}, peso: [] };
+  }
+  var E = carregar();
+  function salvar() { try { localStorage.setItem(CHAVE, JSON.stringify(E)); } catch (e) {} }
+
+  /* "Hoje" pode ser simulado com ?hoje=aaaa-mm-dd, só para teste. */
+  var param = new URLSearchParams(location.search).get('hoje');
+  function hoje() { return /^\d{4}-\d{2}-\d{2}$/.test(param || '') ? param : TB.iso(new Date()); }
+
+  var T = null, V = { tela: 'hoje', dia: hoje(), abertoMob: false };
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function md(s) { return esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); }
+  function num(v) { return String(v).replace('.', ','); }
+  function cap(s) { s = String(s); return s.charAt(0).toUpperCase() + s.slice(1); }
+  function img(ex, cls) {
+    return '<div class="ph' + (cls ? ' ' + cls : '') + '"><img src="img/' + esc(ex.Imagem) + '.png" alt="" loading="lazy" onerror="this.remove()"></div>';
+  }
+
+  /* ---------- marcações ---------- */
+  function checks(data, ex, n) {
+    var d = E.checks[data] = E.checks[data] || {}, a = d[ex.id] || [];
+    while (a.length < n) a.push(false);
+    return a.slice(0, n);
+  }
+  function setCheck(data, ex, n, i) {
+    var a = checks(data, ex, n); a[i] = !a[i];
+    E.checks[data][ex.id] = a; salvar(); return a[i];
+  }
+  function feito(data, ex, n) { return checks(data, ex, n).every(Boolean); }
+
+  function itensDoDia(data) {
+    var s = TB.sessaoDoDia(T, data), out = [];
+    T.mobilidade.blocos.forEach(function (b) { b.itens.forEach(function (ex) { out.push({ ex: ex, mob: true }); }); });
+    if (s) s.blocos.forEach(function (b) { b.itens.forEach(function (ex) { out.push({ ex: ex, mob: false }); }); });
+    return out;
+  }
+  function progresso(data) {
+    var it = itensDoDia(data), f = it.filter(function (x) { return feito(data, x.ex, TB.numSeries(T, x.ex, data, x.mob)); }).length;
+    return { feitos: f, total: it.length };
+  }
+
+  function regDe(id) { return E.reg[id] = E.reg[id] || []; }
+  function setReg(id, data, v) {
+    var l = regDe(id).filter(function (x) { return x.d !== data; });
+    if (v !== '' && !isNaN(+v)) l.push({ d: data, v: +v });
+    l.sort(function (a, b) { return a.d < b.d ? -1 : 1; });
+    E.reg[id] = l; salvar();
+  }
+
+  /* ---------- tela Hoje ---------- */
+  function semanaTopo() {
+    var seg = TB.segundaDe(V.dia), h = hoje(), out = '';
+    for (var k = 0; k < 7; k++) {
+      var s = TB.somaDias(seg, k), st = TB.estadoDia(E.dias, s, h, T.inicio), c = 'day';
+      if (st === 'f' || st === 's' || st === 'x') c += ' ' + st;
+      if (k >= 5) c += ' fds';
+      if (s === V.dia) c += ' sel';
+      if (s === h) c += ' hoje';
+      out += '<button class="' + c + '" data-dia="' + s + '" aria-label="' + TB.dataLonga(s) + '">' + TB.CURTO_DIA[k + 1] + '<i></i></button>';
+    }
+    return '<nav class="week" aria-label="Semana">' + out + '</nav>';
+  }
+
+  function cardEx(ex, data, mob, idx) {
+    var n = TB.numSeries(T, ex, data, mob), a = checks(data, ex, n), ok = a.every(Boolean);
+    var meta = esc(ex.Dose) + (ex.Descanso ? ' · descanso ' + esc(ex.Descanso) : '');
+    var temZona = /tiros|z2|longo/i.test(ex.nome);
+    var h = '<div class="card' + (ok ? ' done' : '') + (temZona ? ' pad' : '') + '" data-ex="' + idx + '">';
+    h += '<div class="row"><button class="abre" data-abre="' + idx + '">' + img(ex) +
+      '<div class="t"><h3>' + esc(ex.nome) + '</h3><p>' + meta + '</p></div></button>' +
+      (ok ? '<div class="chk">' + IC.ok + '</div>' : '') + '</div>';
+    if (!ok || ex.Registro !== 'nada') {
+      if (ex.Registro !== 'nada') {
+        var hj = (regDe(ex.id).filter(function (x) { return x.d === data; })[0] || {}).v;
+        var ant = TB.ultimoAntes(regDe(ex.id), data);
+        var rot = { carga: 'Carga', ajuda: 'Ajuda', tempo: 'Tempo' }[ex.Registro], un = ex.Registro === 'tempo' ? 's' : 'kg';
+        h += '<div class="log"><label class="field"><small>' + rot + '</small><input inputmode="decimal" data-reg="' + idx + '" value="' +
+          (hj === undefined ? '' : num(hj)) + '" aria-label="' + rot + ' em ' + un + '"><em>' + un + '</em></label>' +
+          '<p class="last">' + (ant ? 'Última vez: <b>' + num(ant.v) + ' ' + un + '</b>' : 'Primeira vez') +
+          (ex.Registro === 'ajuda' ? '<br>Menos ajuda = mais forte' : '') + '</p></div>';
+      }
+      h += '<div class="sets">';
+      for (var i = 0; i < n; i++) {
+        h += '<button class="set' + (a[i] ? ' ok' : '') + (n === 1 ? ' um' : '') + '" data-set="' + idx + ':' + i + '" aria-pressed="' + a[i] + '">' +
+          (n === 1 ? (a[i] ? 'Feito' : 'Marcar como feito') : (i + 1)) + '</button>';
+      }
+      h += '</div>';
+    }
+    if (/tiros/i.test(ex.nome)) h += zona([[0, 114, ''], [114, 133, 'Leve ≤133', 'calm'], [133, 162, ''], [162, FCMAX, 'Tiro 162–180', 'hot']], [133, 162]);
+    if (/z2|longo/i.test(ex.nome)) h += zona([[100, 114, ''], [114, 133, 'Z2 114–133', 'calm'], [133, FCMAX, '']], [114, 133]);
+    return h + '</div>';
+  }
+
+  function zona(faixas, marcas) {
+    var ini = 100, tot = FCMAX - ini, cols = faixas.map(function (f) { return ((Math.min(f[1], FCMAX) - Math.max(f[0], ini)) / tot * 100).toFixed(1) + '%'; });
+    var cor = { calm: 'background:var(--calm-soft);color:var(--calm)', hot: 'background:var(--hot-soft);color:var(--hot)' };
+    var h = '<div class="zbar" style="grid-template-columns:' + cols.join(' ') + '">';
+    faixas.forEach(function (f) { h += '<div style="' + (cor[f[3]] || 'background:#F1EFEA') + '">' + esc(f[2]) + '</div>'; });
+    h += '</div><div class="zticks">';
+    marcas.forEach(function (m) { h += '<span style="left:' + ((m - ini) / tot * 100).toFixed(1) + '%">' + m + '</span>'; });
+    return h + '<span style="right:0;transform:none">' + FCMAX + ' bpm</span></div>';
+  }
+
+  var LISTA = []; // exercícios da tela atual, por índice
+  function telaHoje() {
+    var d = V.dia, h = hoje(), s = TB.sessaoDoDia(T, d), sem = TB.indiceSemana(T, d) + 1, pr = progresso(d);
+    LISTA = [];
+    var html = '<header class="top"><button class="brand" data-ir="perfil" aria-label="Abrir perfil">' + esc(T.titulo) + '</button>' +
+      '<button class="icon" data-ir="orient" aria-label="Orientações">' + IC.info + '</button></header>' + semanaTopo();
+    var nome = s ? s.nome : (TB.diaSemana(d) === 7 ? 'Descanso' : 'Livre');
+    html += '<section class="hero"><p class="eyebrow">' + TB.dataLonga(d) + (d === h ? ' · hoje' : '') + ' · semana ' + sem + '</p>' +
+      '<h1>' + esc(nome) + '</h1>' + (s && s.nota ? '<p class="nota">' + esc(s.nota.replace(/Vale nas semanas.*$/, '').trim() || '') + '</p>' : '') +
+      '<div class="bar"><span style="width:' + Math.round(100 * pr.feitos / pr.total) + '%"></span></div>' +
+      '<p class="small">' + pr.feitos + ' de ' + pr.total + ' itens</p></section>';
+    if (!s) html += '<section class="sec"><p class="nota" style="padding:0 4px 8px">' +
+      (TB.diaSemana(d) === 7 ? 'Domingo é livre. Se quiser, faça a mobilidade. Se treinar, conta como extra.' : 'Sem treino marcado para hoje.') + '</p></section>';
+
+    // Mobilidade
+    var mob = T.mobilidade.blocos[0].itens, mf = mob.filter(function (ex) { return feito(d, ex, TB.numSeries(T, ex, d, true)); }).length;
+    html += '<section class="sec"><div class="card' + (mf === mob.length ? ' done' : '') + '"><div class="row">' +
+      (mf === mob.length ? '<div class="chk">' + IC.ok + '</div>' : '') +
+      '<div class="t"><h3>1. Mobilidade</h3><p>' + mf + ' de ' + mob.length + ' · ~20 min</p></div>' +
+      '<button class="btn pri" data-guia="1">' + (mf ? 'Continuar' : 'Fazer guiada') + '</button></div>' +
+      '<button class="lnk" data-mob="1">' + (V.abertoMob ? 'Fechar lista' : 'Ver a lista') + '</button></div>';
+    if (V.abertoMob) mob.forEach(function (ex) { LISTA.push({ ex: ex, mob: true }); html += cardEx(ex, d, true, LISTA.length - 1); });
+    html += '</section>';
+
+    // Blocos do dia
+    if (s) s.blocos.forEach(function (b, bi) {
+      var n = b.itens.filter(function (ex) { return feito(d, ex, TB.numSeries(T, ex, d, false)); }).length;
+      html += '<section class="sec"><div class="sech"><h2>' + (bi + 2) + '. ' + esc(b.nome) + '</h2><span>' + n + ' de ' + b.itens.length + '</span></div>';
+      b.itens.forEach(function (ex) { LISTA.push({ ex: ex, mob: false }); html += cardEx(ex, d, false, LISTA.length - 1); });
+      html += '</section>';
+    });
+
+    if (d <= h) {
+      html += '<div class="concluir">' + (E.dias[d]
+        ? '<button class="btn sec2 full" data-concluir="0">Treino concluído ✓ · desfazer</button>'
+        : '<button class="btn pri full" data-concluir="1">Concluir treino</button>') + '</div>';
+    }
+    $app.innerHTML = html;
+  }
+
+  /* ---------- detalhe ---------- */
+  function abrirDetalhe(item) {
+    var ex = item.ex, l = regDe(ex.id), h = '';
+    h += '<div class="scrim" data-fechar="1"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="' + esc(ex.nome) + '">' +
+      '<div class="grab"></div><div class="row" style="justify-content:space-between;align-items:flex-start"><h1>' + esc(ex.nome) + '</h1>' +
+      '<button class="icon" data-fechar="1" aria-label="Fechar">' + IC.x + '</button></div>' +
+      '<div class="chips"><span class="chip">' + esc(ex.Dose) + '</span>' + (ex.Descanso ? '<span class="chip">Descanso ' + esc(ex.Descanso) + '</span>' : '') + '</div>' +
+      img(ex, 'big') + '<h2 class="h">Como fazer</h2><ol class="steps">' +
+      ex.passos.map(function (p) { return '<li>' + md(p) + '</li>'; }).join('') + '</ol>';
+    if (ex['Atenção']) h += '<p class="note">' + md(cap(ex['Atenção'])) + '</p>';
+    if (ex['Se não tiver']) h += '<p class="note calm"><b>Se não tiver:</b> ' + md(ex['Se não tiver']) + '</p>';
+    if (ex['Evolução']) h += '<h2 class="h">Como evoluir</h2><p class="nota">' + md(cap(ex['Evolução'])) + '</p>';
+    if (ex.Registro !== 'nada' && l.length) {
+      var un = ex.Registro === 'tempo' ? 's' : 'kg';
+      h += '<h2 class="h">Sua evolução</h2><div class="card pad chart">' + grafico(l, un) +
+        '<p>' + ({ carga: 'Carga', ajuda: 'Ajuda', tempo: 'Tempo' }[ex.Registro]) + ' em ' + un + ', por dia de treino.' +
+        (ex.Registro === 'ajuda' ? ' A linha descendo é progresso.' : '') + '</p></div>';
+    }
+    $cam.innerHTML = h + '</div>';
+  }
+
+  function grafico(l, un) {
+    var pts = l.slice(-8), W = 300, H = 110, vs = pts.map(function (p) { return p.v; });
+    var mn = Math.min.apply(null, vs), mx = Math.max.apply(null, vs); if (mx === mn) { mx += 1; mn -= 1; }
+    function X(i) { return pts.length === 1 ? W / 2 : 16 + i * (W - 32) / (pts.length - 1); }
+    function Y(v) { return 24 + (mx - v) / (mx - mn) * (H - 52); }
+    var poly = pts.map(function (p, i) { return X(i).toFixed(0) + ',' + Y(p.v).toFixed(0); }).join(' ');
+    var g = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="img" aria-label="Evolução em ' + un + '">' +
+      '<polyline points="' + poly + '" fill="none" stroke="#1F6F50" stroke-width="2.5" stroke-linejoin="round"/>';
+    pts.forEach(function (p, i) {
+      g += '<circle cx="' + X(i).toFixed(0) + '" cy="' + Y(p.v).toFixed(0) + '" r="4" fill="#1F6F50"/>' +
+        '<text x="' + X(i).toFixed(0) + '" y="' + (Y(p.v) - 9).toFixed(0) + '" font-size="11" font-weight="700" text-anchor="middle" fill="#4B5751">' + num(p.v) + '</text>' +
+        '<text x="' + X(i).toFixed(0) + '" y="' + (H - 4) + '" font-size="10.5" text-anchor="middle" fill="#6B756F">' + TB.dataCurta(p.d) + '</text>';
+    });
+    return g + '</svg>';
+  }
+
+  /* ---------- descanso ---------- */
+  var timer = null;
+  function descanso(seg) {
+    clearInterval(timer);
+    var fim = Date.now() + seg * 1000, el = document.getElementById('dock');
+    if (!el) { el = document.createElement('div'); el.id = 'dock'; document.body.appendChild(el); }
+    function tick() {
+      var r = Math.max(0, Math.round((fim - Date.now()) / 1000));
+      if (r === 0) {
+        clearInterval(timer); bip();
+        el.className = 'dock fim';
+        el.innerHTML = '<div><div class="lbl">Descanso</div><div class="tm">Pode ir</div></div><div class="db"></div><button class="btn ghost" data-pular="1">Ok</button>';
+        setTimeout(function () { if (el.className === 'dock fim') el.remove(); }, 5000);
+        return;
+      }
+      el.className = 'dock';
+      el.innerHTML = '<div><div class="lbl">Descanso</div><div class="tm">' + Math.floor(r / 60) + ':' + String(r % 60).padStart(2, '0') + '</div></div>' +
+        '<div class="db"><span style="width:' + (100 - 100 * r / seg).toFixed(0) + '%"></span></div><button class="btn ghost" data-pular="1">Pular</button>';
+    }
+    tick(); timer = setInterval(tick, 250);
+  }
+  function bip() {
+    try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch (e) {}
+    try {
+      var c = new (window.AudioContext || window.webkitAudioContext)(), o = c.createOscillator(), g = c.createGain();
+      o.frequency.value = 880; g.gain.value = .08; o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime + .25);
+    } catch (e) {}
+  }
+
+  /* ---------- mobilidade guiada ---------- */
+  var G = null;
+  function abrirGuia() {
+    var mob = T.mobilidade.blocos[0].itens, d = V.dia, i = 0;
+    while (i < mob.length - 1 && feito(d, mob[i], TB.numSeries(T, mob[i], d, true))) i++;
+    G = { i: i, lado: 0, resta: null, rodando: false, int: null };
+    desenharGuia();
+  }
+  function desenharGuia() {
+    var mob = T.mobilidade.blocos[0].itens, ex = mob[G.i], d = V.dia, tg = TB.tempoGuiado(ex);
+    if (tg && G.resta === null) G.resta = tg.s;
+    var segs = mob.map(function (m, k) { return '<i class="' + (k === G.i ? 'c' : feito(d, m, TB.numSeries(T, m, d, true)) ? 'd' : '') + '"></i>'; }).join('');
+    var h = '<div class="guia" role="dialog" aria-modal="true" aria-label="Mobilidade guiada"><div><div class="gtop"><button class="icon" data-gfechar="1" aria-label="Fechar">' + IC.x + '</button>' +
+      '<b style="font-size:14px">Mobilidade · ' + (G.i + 1) + ' de ' + mob.length + '</b><span style="width:44px"></span></div>' +
+      '<div class="segs" style="grid-template-columns:repeat(' + mob.length + ',1fr)">' + segs + '</div>' +
+      '<div style="padding:0 16px">' + img(ex, 'big') + '</div>' +
+      '<div style="padding:16px 20px 0;text-align:center"><h1 style="font-size:24px;letter-spacing:-.4px">' + esc(ex.nome) + '</h1></div>';
+    if (tg) {
+      var C = 2 * Math.PI * 78, fr = G.resta / tg.s;
+      if (tg.lados === 2) h += '<div class="side"><span class="' + (G.lado === 0 ? 'on' : '') + '">Primeiro lado' + (G.lado > 0 ? ' ✓' : '') + '</span><span class="' + (G.lado === 1 ? 'on' : '') + '">Segundo lado</span></div>';
+      h += '<div class="ring"><svg viewBox="0 0 180 180"><circle cx="90" cy="90" r="78" fill="none" stroke="#E3E0D8" stroke-width="11"/>' +
+        '<circle cx="90" cy="90" r="78" fill="none" stroke="#1F6F50" stroke-width="11" stroke-linecap="round" stroke-dasharray="' + C.toFixed(1) +
+        '" stroke-dashoffset="' + (C * (1 - fr)).toFixed(1) + '"/></svg><div class="in"><div><b>' + Math.floor(G.resta / 60) + ':' +
+        String(G.resta % 60).padStart(2, '0') + '</b><br><span>de ' + Math.floor(tg.s / 60) + ':' + String(tg.s % 60).padStart(2, '0') + '</span></div></div></div>';
+    } else {
+      h += '<p class="dose-g">' + esc(ex.Dose) + '</p>';
+    }
+    h += '<ol class="steps" style="padding:12px 20px 0">' + ex.passos.map(function (p) { return '<li>' + md(p) + '</li>'; }).join('') + '</ol>';
+    if (ex['Atenção']) h += '<p class="note" style="margin:10px 20px 0">' + md(cap(ex['Atenção'])) + '</p>';
+    var meio = tg ? (G.rodando ? 'Pausar' : (G.resta === tg.s && G.lado === 0 ? 'Começar' : 'Continuar')) : 'Feito';
+    h += '</div><div class="ctrl"><button class="btn sec2" data-g="voltar"' + (G.i === 0 ? ' disabled' : '') + '>Voltar</button>' +
+      '<button class="btn pri" data-g="meio">' + meio + '</button><button class="btn sec2" data-g="pular">Pular</button></div></div>';
+    $cam.innerHTML = h;
+  }
+  function guiaConcluirItem() {
+    var mob = T.mobilidade.blocos[0].itens, ex = mob[G.i], n = TB.numSeries(T, ex, V.dia, true);
+    E.checks[V.dia] = E.checks[V.dia] || {}; E.checks[V.dia][ex.id] = Array(n).fill(true); salvar();
+    guiaIr(G.i + 1);
+  }
+  function guiaIr(i) {
+    clearInterval(G.int); G.rodando = false; G.lado = 0; G.resta = null;
+    var mob = T.mobilidade.blocos[0].itens;
+    if (i >= mob.length) { fecharGuia(); return; }
+    G.i = Math.max(0, i); desenharGuia();
+  }
+  function guiaMeio() {
+    var ex = T.mobilidade.blocos[0].itens[G.i], tg = TB.tempoGuiado(ex);
+    if (!tg) { guiaConcluirItem(); return; }
+    if (G.rodando) { clearInterval(G.int); G.rodando = false; desenharGuia(); return; }
+    G.rodando = true;
+    var fim = Date.now() + G.resta * 1000;
+    G.int = setInterval(function () {
+      G.resta = Math.max(0, Math.round((fim - Date.now()) / 1000));
+      if (G.resta === 0) {
+        clearInterval(G.int); bip();
+        if (tg.lados === 2 && G.lado === 0) { G.lado = 1; G.resta = tg.s; G.rodando = false; desenharGuia(); return; }
+        guiaConcluirItem(); return;
+      }
+      desenharGuia();
+    }, 250);
+    desenharGuia();
+  }
+  function fecharGuia() { if (G) clearInterval(G.int); G = null; $cam.innerHTML = ''; render(); }
+
+  /* ---------- perfil ---------- */
+  function telaPerfil() {
+    var h = hoje(), p = E.perfil, html = '<div class="back"><button class="icon" data-ir="hoje" aria-label="Voltar">' + IC.voltar + '</button><b>Perfil</b></div>';
+    if (!p.altura || !p.nasc || !E.peso.length) {
+      html += '<section class="sec"><div class="card pad form"><h2 style="font-size:18px">Seus dados</h2>' +
+        '<p class="nota">Ficam só neste celular.</p>' +
+        '<label for="f-peso">Peso (kg)</label><input id="f-peso" inputmode="decimal" placeholder="ex.: 80">' +
+        '<label for="f-alt">Altura (m)</label><input id="f-alt" inputmode="decimal" placeholder="ex.: 1,80">' +
+        '<label for="f-nasc">Data de nascimento</label><input id="f-nasc" type="date">' +
+        '<button class="btn pri full" style="margin-top:20px" data-salvarperfil="1">Salvar</button></div></section>';
+      $app.innerHTML = html; return;
+    }
+    var p0 = E.peso[0], p1 = E.peso[E.peso.length - 1], dv = Math.round((p1.kg - p0.kg) * 10) / 10;
+    html += '<div class="id"><div class="av">' + esc(T.titulo.replace(/^.* /, '').charAt(0)) + '</div><div><h1 style="font-size:26px">' +
+      esc(T.titulo.replace(/^Treino d[oa] /, '')) + '</h1><p class="meta" style="margin:0">' + TB.idade(p.nasc, h) + ' anos · treinando desde ' + TB.dataCurta(T.inicio) + '</p></div></div>';
+    html += '<section class="sec"><div class="card pad"><div class="wt"><div><small>Peso atual · ' + TB.dataCurta(p1.d) + '</small><b>' + num(p1.kg) + ' kg</b></div>' +
+      '<button class="btn sec2" data-peso="1">Atualizar</button></div>' +
+      '<div class="wh"><div><small>Inicial · ' + TB.dataCurta(p0.d) + '</small><b>' + num(p0.kg) + ' kg</b></div><div><small>Variação</small><b style="color:var(--accent)">' +
+      (dv > 0 ? '+' : dv < 0 ? '−' : '') + num(Math.abs(dv)) + ' kg</b></div><div><small>Registros</small><b>' + E.peso.length + '</b></div></div>' +
+      (E.peso.length > 1 ? '<details class="hist"><summary class="lnk">Ver histórico</summary><ul>' + E.peso.slice().reverse().map(function (x) {
+        return '<li><span>' + TB.dataCurta(x.d) + '</span><b>' + num(x.kg) + ' kg</b></li>'; }).join('') + '</ul></details>' : '') + '</div>' +
+      '<div class="two"><div><small>Altura</small><b>' + num(p.altura) + ' m</b></div><div><small>Nascimento</small><b>' +
+      p.nasc.split('-').reverse().join('/') + '</b></div></div>';
+
+    // Esta semana
+    var seg = TB.segundaDe(h), strip = '';
+    for (var k = 0; k < 7; k++) {
+      var s = TB.somaDias(seg, k), st = TB.estadoDia(E.dias, s, h, T.inicio);
+      if (k >= 5 && st === 'c') st = 'o';
+      strip += '<button data-toggle="' + s + '"' + (s > h ? ' disabled' : '') + ' class="' + (s === h ? 'hojec' : '') + '" aria-label="' + TB.dataLonga(s) +
+        '"><span>' + TB.CURTO_DIA[k + 1] + '</span><span class="dot ' + st + '">' + (st === 'f' || st === 's' ? IC.ok : st === 'x' ? IC.no : '') +
+        '</span><span class="dt">' + +s.slice(8) + '</span></button>';
+    }
+    var nd = TB.diaSemana(h);
+    html += '<div class="card pad" style="margin-top:20px"><div class="wkh"><h2>Esta semana</h2><span>Hoje é ' + TB.NOMES_DIA[nd].toLowerCase() + ', ' + TB.dataCurta(h) + '</span></div><div class="strip">' + strip + '</div></div>';
+
+    // Frequência total
+    var fq = TB.frequencia(T, E.dias, h), sems = fq.semanas.slice(-8), base = fq.semanas.length - sems.length;
+    html += '<div class="sech" style="padding-top:20px"><h2>Frequência total</h2><span>' + fq.semanas.length + ' semana' + (fq.semanas.length > 1 ? 's' : '') +
+      (fq.extras ? ' · ' + fq.extras + ' extra' + (fq.extras > 1 ? 's' : '') : '') + '</span></div>' +
+      '<div class="card pad"><div class="stats"><div><b>' + fq.feitos + '</b><small>feitos</small></div><div><b style="color:var(--hot)">' + fq.furados +
+      '</b><small>furados</small></div><div><b style="color:var(--accent)">' + (fq.aproveitamento === null ? '—' : fq.aproveitamento + '%') + '</b><small>aproveitamento</small></div></div>' +
+      '<div class="cal"><span></span>' + TB.CURTO_DIA.slice(1).map(function (x) { return '<span>' + x + '</span>'; }).join('');
+    sems.forEach(function (w, i) {
+      html += '<span class="wk">Sem ' + (base + i + 1) + '</span>' + w.map(function (c) {
+        var st = c.estado; if (TB.diaSemana(c.data) >= 6 && st === 'c') st = 'o';
+        return '<span class="dot ' + st + '">' + (st === 'f' || st === 's' ? IC.ok : st === 'x' ? IC.no : '') + '</span>';
+      }).join('');
+    });
+    html += '</div><div class="leg"><span><i class="dot f">' + IC.ok + '</i>Feito</span><span><i class="dot x">' + IC.no + '</i>Furou</span><span><i class="dot s">' +
+      IC.ok + '</i>Extra</span><span><i class="dot h"></i>Hoje</span></div></div>' +
+      '<button class="btn pri full" style="margin-top:4px" data-enviar="1">Enviar resumo ao JP</button></section>';
+    $app.innerHTML = html;
+  }
+
+  function folhaPeso() {
+    $cam.innerHTML = '<div class="scrim" data-fechar="1"></div><div class="sheet form" style="top:auto;border-radius:24px 24px 0 0">' +
+      '<div class="grab"></div><h1 style="font-size:22px">Atualizar peso</h1><label for="f-np">Peso de hoje (kg)</label>' +
+      '<input id="f-np" inputmode="decimal" placeholder="ex.: 80,5"><button class="btn pri full" style="margin-top:16px" data-salvarpeso="1">Salvar</button></div>';
+    var i = document.getElementById('f-np'); if (i) i.focus();
+  }
+  function lerNum(v) { return parseFloat(String(v).replace(',', '.')); }
+
+  /* ---------- orientações ---------- */
+  function telaOrient() {
+    $app.innerHTML = '<div class="back"><button class="icon" data-ir="hoje" aria-label="Voltar">' + IC.voltar + '</button><b>Orientações</b></div>' +
+      '<section class="sec"><div class="card pad"><ul class="orient">' + T.orientacoes.map(function (o) { return '<li>' + md(o) + '</li>'; }).join('') + '</ul></div></section>';
+  }
+
+  function render() {
+    if (V.tela === 'perfil') telaPerfil(); else if (V.tela === 'orient') telaOrient(); else telaHoje();
+  }
+
+  /* ---------- eventos ---------- */
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('button,[data-fechar],summary'); if (!b) return;
+    var ds = b.dataset;
+    if (ds.ir) { V.tela = ds.ir; render(); scrollTo(0, 0); return; }
+    if (ds.dia) { V.dia = ds.dia; render(); return; }
+    if (ds.mob) { V.abertoMob = !V.abertoMob; render(); return; }
+    if (ds.abre) { abrirDetalhe(LISTA[+ds.abre]); return; }
+    if (ds.fechar) { $cam.innerHTML = ''; return; }
+    if (ds.set) {
+      var p = ds.set.split(':'), it = LISTA[+p[0]], n = TB.numSeries(T, it.ex, V.dia, it.mob), on = setCheck(V.dia, it.ex, n, +p[1]);
+      var seg = TB.descansoSeg(it.ex);
+      if (on && seg && V.dia === hoje() && !feito(V.dia, it.ex, n)) descanso(seg);
+      render(); return;
+    }
+    if (ds.pular) { clearInterval(timer); var dk = document.getElementById('dock'); if (dk) dk.remove(); return; }
+    if (ds.concluir) { if (ds.concluir === '1') E.dias[V.dia] = true; else delete E.dias[V.dia]; salvar(); render(); return; }
+    if (ds.guia) { abrirGuia(); return; }
+    if (ds.gfechar) { fecharGuia(); return; }
+    if (ds.g === 'voltar') { guiaIr(G.i - 1); return; }
+    if (ds.g === 'pular') { guiaIr(G.i + 1); return; }
+    if (ds.g === 'meio') { guiaMeio(); return; }
+    if (ds.toggle) { if (E.dias[ds.toggle]) delete E.dias[ds.toggle]; else E.dias[ds.toggle] = true; salvar(); render(); return; }
+    if (ds.peso) { folhaPeso(); return; }
+    if (ds.salvarpeso) {
+      var v = lerNum(document.getElementById('f-np').value);
+      if (!(v > 20 && v < 300)) { alert('Confira o peso: use só números, como 80,5.'); return; }
+      var hj = hoje(); E.peso = E.peso.filter(function (x) { return x.d !== hj; }); E.peso.push({ d: hj, kg: v });
+      E.peso.sort(function (a, c) { return a.d < c.d ? -1 : 1; }); salvar(); $cam.innerHTML = ''; render(); return;
+    }
+    if (ds.salvarperfil) {
+      var pe = lerNum(document.getElementById('f-peso').value), al = lerNum(document.getElementById('f-alt').value), na = document.getElementById('f-nasc').value;
+      if (al > 3) al = al / 100;
+      if (!(pe > 20 && pe < 300) || !(al > 1 && al < 2.5) || !/^\d{4}-\d{2}-\d{2}$/.test(na)) { alert('Confira os três campos.'); return; }
+      E.perfil = { altura: al, nasc: na }; E.peso = [{ d: hoje(), kg: pe }]; salvar(); render(); return;
+    }
+    if (ds.enviar) { location.href = 'https://wa.me/?text=' + encodeURIComponent(TB.resumo(T, E, hoje())); return; }
+  });
+  document.addEventListener('change', function (e) {
+    var i = e.target.dataset && e.target.dataset.reg; if (i === undefined) return;
+    var v = lerNum(e.target.value); setReg(LISTA[+i].ex.id, V.dia, isNaN(v) ? '' : v); render();
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $cam.innerHTML) { if (G) fecharGuia(); else $cam.innerHTML = ''; } });
+
+  /* ---------- início ---------- */
+  fetch('treino.md', { cache: 'no-cache' }).then(function (r) {
+    if (!r.ok) throw new Error('não consegui abrir o treino.md (' + r.status + ')');
+    return r.text();
+  }).then(function (txt) {
+    T = TB.lerTreino(txt); render();
+  }).catch(function (e) {
+    $app.innerHTML = '<div class="erro"><b>O treino não abriu.</b><br>' + esc(e.message) + '<br><br>Se você editou o treino.md, confira essa linha.</div>';
+  });
+  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js');
+})();
