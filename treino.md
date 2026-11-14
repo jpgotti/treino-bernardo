@@ -2,7 +2,7 @@
 Fonte única do app. O app lê este arquivo; editar aqui muda o app.
 Estrutura que o app entende (não mudar os rótulos):
   "## Dia — Nome" abre um dia; "### Bloco" abre um bloco; "#### Exercício" abre um exercício.
-  Campos do exercício, um por linha: "Dose:", "Descanso:", "Registro:" (carga, ajuda, tempo ou nada), "Imagem:" (nome do arquivo em img/, sem .png),
+  Campos do exercício, um por linha: "Dose:", "Descanso:", "Registro:" (carga, ajuda, tempo ou nada), "Imagem:" (nome do arquivo em img/, sem .png), "Busca:" (nome pelo qual o exercício é conhecido, para o botão do Google),
   depois "Como fazer:" com lista numerada, e opcionais "Atenção:", "Evolução:", "Se não tiver:".
 Se o app não conseguir ler, ele mostra a linha com problema em vez de abrir pela metade.
 -->
@@ -34,6 +34,7 @@ Antes de qualquer treino, inclusive no fim de semana. Cerca de 20 minutos.
 Dose: 1 × 10
 Registro: nada
 Imagem: gato-vaca
+Busca: cat cow stretch
 Como fazer:
 1. Fique de quatro: mãos embaixo dos ombros, joelhos embaixo do quadril.
 2. Soltando o ar, arredonde as costas e olhe para o umbigo.
@@ -44,6 +45,7 @@ Como fazer:
 Dose: 1 × 10 por lado
 Registro: nada
 Imagem: rotacao-quadril-brucos
+Busca: prone hip internal external rotation
 Como fazer:
 1. Deite de barriga para baixo, com a testa apoiada nas mãos.
 2. Dobre um joelho a 90°, com o pé apontando para o teto.
@@ -55,6 +57,7 @@ Atenção: o quadril fica colado no chão o tempo todo. O movimento é só a cox
 Dose: 1 × 10 trocas
 Registro: nada
 Imagem: noventa-noventa
+Busca: 90 90 hip mobility
 Como fazer:
 1. Sente no chão com as duas pernas dobradas a 90°: uma à frente do corpo, a outra ao lado.
 2. Com o tronco alto, gire os dois joelhos para o outro lado, até as pernas trocarem de posição.
@@ -64,15 +67,17 @@ Como fazer:
 Dose: 1 × 10 por lado
 Registro: nada
 Imagem: adutor-sapo
+Busca: adductor rock back exercise
 Como fazer:
 1. Fique de quatro e estique uma perna para o lado, com o pé inteiro no chão.
 2. Leve o quadril para trás, em direção ao calcanhar da perna dobrada, até sentir a parte de dentro da coxa esticada.
 3. Volte e repita. Depois troque de lado.
 
-#### Perdigueiro
+#### Perdigueiro (bird dog)
 Dose: 1 × 6 por lado, 5 s parado
 Registro: nada
 Imagem: perdigueiro
+Busca: bird dog exercise
 Como fazer:
 1. Fique de quatro, com as costas retas.
 2. Estique um braço à frente e a perna do lado oposto para trás, até ficarem na linha do tronco.
@@ -83,6 +88,7 @@ Como fazer:
 Dose: 1 × 12, 2 s no alto
 Registro: nada
 Imagem: ponte-gluteo
+Busca: glute bridge
 Como fazer:
 1. Deite de barriga para cima, joelhos dobrados e pés no chão.
 2. Empurre o chão com os calcanhares e suba o quadril até joelho, quadril e ombro ficarem em linha.
@@ -93,6 +99,7 @@ Atenção: quem trabalha é o glúteo. Se sentir a lombar, suba um pouco menos.
 Dose: 60 s por lado
 Registro: nada
 Imagem: figura-4
+Busca: figure 4 stretch
 Como fazer:
 1. Deite de barriga para cima, joelhos dobrados.
 2. Cruze o tornozelo direito por cima do joelho esquerdo, formando um "4".
@@ -103,6 +110,7 @@ Como fazer:
 Dose: 1 × 10 por lado
 Registro: nada
 Imagem: dorsiflexao
+Busca: knee to wall ankle mobility
 Como fazer:
 1. De frente para uma parede, com as mãos apoiadas nela e um pé à frente, a ponta do pé a um palmo da parede.
 2. Leve o joelho da frente em direção à parede, sem tirar o calcanhar do chão. O peso do corpo já basta.
@@ -113,6 +121,7 @@ Como fazer:
 Dose: 60 s por lado
 Registro: nada
 Imagem: flexor-quadril
+Busca: half kneeling hip flexor stretch
 Como fazer:
 1. Fique com um joelho no chão (use um colchonete) e o outro pé à frente, como num pedido de casamento.
 2. Contraia o glúteo da perna de trás e leve o quadril um pouco para a frente.
@@ -123,6 +132,7 @@ Como fazer:
 Dose: 45 s por lado
 Registro: nada
 Imagem: posterior-banco
+Busca: standing hamstring stretch on bench
 Como fazer:
 1. Apoie o calcanhar num banco baixo, com o joelho quase esticado.
 2. Com as costas retas, incline o tronco à frente dobrando no quadril, não na coluna.
@@ -132,6 +142,7 @@ Como fazer:
 Dose: 1 × 10, 3 s embaixo
 Registro: nada
 Imagem: toracica-banco
+Busca: bench thoracic extension stretch
 Como fazer:
 1. Ajoelhe de frente para um banco e apoie os cotovelos nele, mãos juntas atrás da cabeça.
 2. Sente o quadril para trás e deixe o peito descer em direção ao chão.
@@ -141,20 +152,22 @@ Como fazer:
 Dose: 45 s por lado
 Registro: nada
 Imagem: peitoral-espaldar
+Busca: doorway pec stretch
 Como fazer:
 1. Apoie o antebraço no espaldar (ou no batente de uma porta), com o cotovelo na altura do ombro.
 2. Gire o corpo devagar para o lado oposto, até sentir o peito esticar.
 3. Segure e troque de lado.
 
-#### Pendurar na barra
-Dose: 1 × 30–45 s
-Registro: tempo
+#### Pendurar na barra (dead hang)
+Dose: meta de 1 minuto
+Registro: nada
 Imagem: pendurar-barra
+Busca: dead hang
 Como fazer:
 1. Segure a barra com as mãos um pouco mais abertas que os ombros.
 2. Deixe o corpo pendurado e relaxe os ombros.
-3. Respire devagar até o fim do tempo.
-Se não tiver: força para aguentar o tempo todo? Deixe a ponta dos pés apoiada num banco.
+3. Respire devagar e fique até completar 1 minuto, sem soltar no meio.
+Evolução: não aguentou 1 minuto? Fique o máximo que conseguir e vá aumentando a cada treino, até chegar ao minuto inteiro.
 
 ## Segunda — Puxar
 
@@ -165,6 +178,7 @@ Dose: 2 × 10
 Descanso: 30 s
 Registro: nada
 Imagem: serratus-cotovelos
+Busca: forearm plank serratus push up
 Como fazer:
 1. Fique em prancha apoiado nos antebraços.
 2. Sem dobrar os braços, deixe o peito descer um pouco, aproximando as escápulas.
@@ -175,6 +189,7 @@ Dose: 4 × 6–8
 Descanso: 90 s
 Registro: ajuda
 Imagem: gravitron
+Busca: assisted pull up machine
 Como fazer:
 1. Escolha a ajuda: quanto mais peso na máquina, mais ela empurra você para cima.
 2. Ajoelhe na plataforma e segure as alças com as palmas viradas uma para a outra.
@@ -189,6 +204,7 @@ Dose: 3 × 8–10 por lado
 Descanso: 75 s
 Registro: carga
 Imagem: remada-unilateral
+Busca: one arm dumbbell row
 Como fazer:
 1. Apoie o joelho e a mão do mesmo lado num banco. O outro pé fica no chão.
 2. Com as costas retas e paralelas ao chão, segure o halter com o braço esticado.
@@ -200,6 +216,7 @@ Dose: 3 × 12
 Descanso: 60 s
 Registro: carga
 Imagem: pullover-polia
+Busca: cable straight arm pulldown
 Como fazer:
 1. Na polia alta, segure uma barra reta com os braços quase esticados, acima da cabeça.
 2. Com o tronco levemente inclinado à frente, puxe a barra num arco até encostar nas coxas.
@@ -210,6 +227,7 @@ Dose: 3 × 12–15
 Descanso: 60 s
 Registro: carga
 Imagem: face-pull
+Busca: cable face pull
 Como fazer:
 1. Prenda a corda na polia, na altura do rosto.
 2. Puxe a corda em direção à testa, abrindo as mãos para os lados das orelhas, com os cotovelos altos.
@@ -220,6 +238,7 @@ Dose: 2 × 12
 Descanso: 45 s
 Registro: carga
 Imagem: elevacao-y
+Busca: incline dumbbell Y raise
 Como fazer:
 1. Deite de barriga para baixo num banco inclinado, com um halter leve em cada mão.
 2. Com os braços esticados formando um "Y" e os polegares para cima, eleve até a altura das orelhas.
@@ -231,6 +250,7 @@ Dose: 3 × 20–30 s
 Descanso: 45 s
 Registro: tempo
 Imagem: hiperextensao
+Busca: back extension isometric hold
 Como fazer:
 1. No banco romano, ajuste o apoio para ficar logo abaixo do quadril.
 2. Deixe o corpo reto, da cabeça aos pés, e segure parado.
@@ -246,6 +266,7 @@ Dose: 2 × 6, 8 s parado
 Descanso: 30 s
 Registro: nada
 Imagem: curl-up
+Busca: McGill curl up
 Como fazer:
 1. Deite de barriga para cima, uma perna dobrada e a outra esticada, com as mãos embaixo da lombar.
 2. Suba só a cabeça e os ombros alguns centímetros, sem dobrar o pescoço, e segure 8 segundos.
@@ -256,6 +277,7 @@ Dose: 2 × 20–30 s por lado
 Descanso: 30 s
 Registro: tempo
 Imagem: prancha-lateral
+Busca: side plank on knees
 Como fazer:
 1. Deite de lado com o cotovelo embaixo do ombro.
 2. Suba o quadril até o corpo ficar em linha reta.
@@ -267,6 +289,7 @@ Dose: 2 × 30–45 s
 Descanso: 30 s
 Registro: tempo
 Imagem: prancha-frontal
+Busca: forearm plank
 Como fazer:
 1. Apoie os antebraços e as pontas dos pés no chão.
 2. Mantenha o corpo reto, da cabeça aos calcanhares, com o glúteo contraído.
@@ -277,6 +300,7 @@ Dose: 2 × 20 s por lado
 Descanso: 30 s
 Registro: carga
 Imagem: pallof
+Busca: Pallof press hold
 Como fazer:
 1. Fique de lado para a polia, ajustada na altura do peito.
 2. Segure o puxador junto ao peito e estique os braços à frente.
@@ -287,6 +311,7 @@ Dose: 2 × 30 m por lado
 Descanso: 45 s
 Registro: carga
 Imagem: caminhada-unilateral
+Busca: suitcase carry
 Como fazer:
 1. Segure um halter pesado numa mão só.
 2. Caminhe com o tronco reto, sem inclinar para o lado do peso.
@@ -297,6 +322,7 @@ Dose: 2 × 15 s
 Descanso: 30 s
 Registro: nada
 Imagem: vacuo
+Busca: stomach vacuum exercise
 Como fazer:
 1. Em pé ou de quatro, solte todo o ar.
 2. Sem puxar ar, leve o umbigo para dentro e para cima e segure.
@@ -308,6 +334,7 @@ Como fazer:
 Dose: 5 min leve + 8 × (1 min forte / 1 min leve) + 5 min leve
 Registro: nada
 Imagem: tiros-bike
+Busca: stationary bike 1 minute intervals
 Como fazer:
 1. Aqueça 5 minutos pedalando leve, até 133 bpm.
 2. Em cada tiro, pedale forte por 1 minuto, até fechar entre 162 e 180 bpm.
@@ -325,6 +352,7 @@ Dose: 2 × 10
 Descanso: 30 s
 Registro: nada
 Imagem: serratus-bracos
+Busca: scapular push up
 Como fazer:
 1. Fique em prancha com os braços esticados.
 2. Sem dobrar os cotovelos, deixe o peito descer alguns centímetros, aproximando as escápulas.
@@ -335,6 +363,7 @@ Dose: 4 × 8–10
 Descanso: 90 s
 Registro: carga
 Imagem: supino-inclinado
+Busca: incline dumbbell press
 Como fazer:
 1. Ajuste o banco a cerca de 30°. Deite com um halter em cada mão, na altura do peito.
 2. Leve os ombros para trás e para baixo, e mantenha os cotovelos a uns 45° do corpo, não abertos em "T".
@@ -346,6 +375,7 @@ Dose: 3 × 6–10
 Descanso: 90 s
 Registro: ajuda
 Imagem: paralelas
+Busca: chest dips
 Como fazer:
 1. Segure as barras com os braços esticados e o tronco levemente inclinado à frente.
 2. Desça dobrando os cotovelos até os ombros ficarem mais ou menos na altura deles.
@@ -358,6 +388,7 @@ Dose: 3 × 8–10
 Descanso: 90 s
 Registro: carga
 Imagem: desenvolvimento
+Busca: seated dumbbell shoulder press
 Como fazer:
 1. Sente num banco de encosto quase reto, com a lombar apoiada.
 2. Comece com os halteres na altura das orelhas, palmas para a frente.
@@ -368,6 +399,7 @@ Dose: 3 × 10–12
 Descanso: 60 s
 Registro: carga
 Imagem: crucifixo
+Busca: dumbbell chest fly
 Como fazer:
 1. Deite no banco reto com os halteres acima do peito e os cotovelos levemente dobrados.
 2. Abra os braços num arco, sem mudar a dobra do cotovelo, até sentir o peito alongar.
@@ -379,6 +411,7 @@ Dose: 3 × 12–15
 Descanso: 60 s
 Registro: carga
 Imagem: elevacao-lateral
+Busca: dumbbell lateral raise
 Como fazer:
 1. Em pé, com um halter em cada mão ao lado do corpo.
 2. Eleve os braços para os lados até a altura dos ombros, com os cotovelos levemente dobrados, puxando o movimento pelos cotovelos.
@@ -389,6 +422,7 @@ Dose: 2 × o máximo que conseguir
 Descanso: 60 s
 Registro: nada
 Imagem: flexao-braco
+Busca: push up proper form
 Como fazer:
 1. Mãos no chão um pouco mais abertas que os ombros, corpo reto da cabeça aos calcanhares.
 2. Desça até o peito quase encostar no chão, com os cotovelos a uns 45° do corpo.
@@ -404,6 +438,7 @@ Dose: 3 × 10–12
 Descanso: 45 s
 Registro: carga
 Imagem: abdominal-polia
+Busca: kneeling cable crunch
 Como fazer:
 1. Ajoelhe de frente para a polia alta, segurando a corda junto à cabeça.
 2. Enrole o tronco levando os cotovelos em direção às coxas.
@@ -414,6 +449,7 @@ Dose: 3 × 8–12
 Descanso: 45 s
 Registro: nada
 Imagem: elevacao-joelhos
+Busca: hanging knee raise
 Como fazer:
 1. Pendure na barra com os ombros firmes.
 2. Suba os joelhos até a altura do quadril ou acima, enrolando levemente o quadril para cima.
@@ -425,6 +461,7 @@ Dose: 2 × 12 por lado
 Descanso: 45 s
 Registro: carga
 Imagem: flexao-lateral
+Busca: dumbbell side bend
 Como fazer:
 1. Em pé, com um halter numa mão e a outra mão na cintura.
 2. Incline o tronco para o lado do halter.
@@ -435,6 +472,7 @@ Dose: 2 × 10 por lado
 Descanso: 45 s
 Registro: carga
 Imagem: woodchop
+Busca: cable woodchop high to low
 Como fazer:
 1. Fique de lado para a polia alta, segurando o puxador com as duas mãos.
 2. Puxe em diagonal até a altura do quadril do lado oposto, com os braços quase esticados.
@@ -446,6 +484,7 @@ Como fazer:
 Dose: 45–60 min
 Registro: nada
 Imagem: cardio-leve
+Busca: zone 2 cardio incline walk
 Como fazer:
 1. Escolha: bike, esteira inclinada, escada ou elíptico.
 2. Mantenha entre 114 e 133 bpm o tempo todo.
@@ -462,6 +501,7 @@ Dose: 4 × 6–8
 Descanso: 120 s
 Registro: carga
 Imagem: agachamento
+Busca: barbell back squat
 Como fazer:
 1. Apoie a barra no alto das costas, não no pescoço. Pés na largura dos ombros, pontas levemente para fora.
 2. Sente para trás e para baixo, com os joelhos acompanhando a direção dos pés.
@@ -475,6 +515,7 @@ Dose: 3 × 8 por lado
 Descanso: 90 s
 Registro: carga
 Imagem: bulgaro
+Busca: dumbbell bulgarian split squat
 Como fazer:
 1. Apoie o peito do pé de trás num banco. O pé da frente fica a um passo longo.
 2. Desça o joelho de trás em direção ao chão, com o tronco levemente inclinado à frente.
@@ -486,6 +527,7 @@ Dose: 3 × 10
 Descanso: 75 s
 Registro: carga
 Imagem: leg-press
+Busca: 45 degree leg press
 Como fazer:
 1. Costas e quadril colados no encosto, pés no meio da plataforma, na largura do quadril.
 2. Desça até o joelho formar cerca de 90°, sem o quadril descolar do banco.
@@ -496,6 +538,7 @@ Dose: 3 × 12
 Descanso: 60 s
 Registro: carga
 Imagem: extensora
+Busca: leg extension machine
 Como fazer:
 1. Ajuste o encosto para o joelho ficar alinhado com o eixo da máquina e o rolo apoiado logo acima do tornozelo.
 2. Estique as pernas, segure 1 segundo lá em cima e desça devagar.
@@ -505,6 +548,7 @@ Dose: 2 × 8 por lado
 Descanso: 75 s
 Registro: carga
 Imagem: stiff-unilateral
+Busca: single leg romanian deadlift dumbbell
 Como fazer:
 1. Fique em uma perna só, com o joelho levemente dobrado e o halter na mão do lado oposto.
 2. Incline o tronco à frente, levando a outra perna para trás em linha com as costas, até sentir esticar atrás da coxa.
@@ -522,6 +566,7 @@ Dose: 3 × 8 por lado
 Descanso: 90 s
 Registro: carga
 Imagem: stiff-unilateral
+Busca: single leg romanian deadlift dumbbell
 Como fazer:
 1. Fique em uma perna só, com o joelho levemente dobrado e o halter na mão do lado oposto.
 2. Incline o tronco à frente, levando a outra perna para trás em linha com as costas, até sentir esticar atrás da coxa.
@@ -533,6 +578,7 @@ Dose: 3 × 8 por lado
 Descanso: 75 s
 Registro: carga
 Imagem: passada-reversa
+Busca: reverse lunge
 Como fazer:
 1. Em pé, dê um passo largo para trás.
 2. Desça até os dois joelhos ficarem perto de 90°, com o joelho de trás quase no chão.
@@ -543,6 +589,7 @@ Dose: 3 × 8–10
 Descanso: 60 s
 Registro: nada
 Imagem: flexora-bola
+Busca: stability ball hamstring curl
 Como fazer:
 1. Deite de barriga para cima, com os calcanhares sobre a bola.
 2. Suba o quadril, como na ponte de glúteo.
@@ -555,6 +602,7 @@ Dose: 3 × 10
 Descanso: 60 s
 Registro: carga
 Imagem: mesa-flexora
+Busca: lying leg curl machine
 Como fazer:
 1. Ajuste a máquina para o joelho ficar alinhado com o eixo e o rolo logo acima do calcanhar.
 2. Dobre as pernas, trazendo o rolo em direção ao glúteo.
@@ -566,6 +614,7 @@ Dose: 3 × 15
 Descanso: 45 s
 Registro: carga
 Imagem: abdutora
+Busca: hip abduction machine
 Como fazer:
 1. Sente com as costas apoiadas e as pernas encostadas nas almofadas, pelo lado de fora.
 2. Abra as pernas até onde for confortável, segure 1 segundo e feche devagar.
@@ -575,6 +624,7 @@ Dose: 3 × 15
 Descanso: 45 s
 Registro: carga
 Imagem: adutora
+Busca: hip adduction machine
 Como fazer:
 1. Sente com as costas apoiadas e as pernas abertas, com as almofadas pelo lado de dentro.
 2. Feche as pernas, segure 1 segundo e abra devagar.
@@ -589,6 +639,7 @@ Fim de semana é livre. O mais recomendado é descansar. Se quiser, faça a mobi
 Dose: 45–90 min
 Registro: nada
 Imagem: longo-leve
+Busca: long easy walk zone 1
 Como fazer:
 1. Caminhada ou bike longa, no ritmo de passeio.
 2. Não é a Z2 da quinta: é mais leve. Dá para conversar com folga o tempo todo.
@@ -604,6 +655,7 @@ Fim de semana é livre. O mais recomendado é descansar. Se quiser, faça a mobi
 Dose: 45–90 min
 Registro: nada
 Imagem: longo-leve
+Busca: long easy walk zone 1
 Como fazer:
 1. Caminhada ou bike longa, no ritmo de passeio.
 2. Não é a Z2 da quinta: é mais leve. Dá para conversar com folga o tempo todo.

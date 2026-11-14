@@ -199,8 +199,9 @@
         '<p>' + ({ carga: 'Carga', ajuda: 'Ajuda', tempo: 'Tempo' }[ex.Registro]) + ' em ' + un + ', por dia de treino.' +
         (ex.Registro === 'ajuda' ? ' A linha descendo é progresso.' : '') + '</p></div>';
     }
-    h += '<a class="google" href="https://www.google.com/search?q=' + encodeURIComponent(ex.nome + ' exercício') + '" target="_blank" rel="noopener">' +
-      '<span>Ficou em dúvida?<b>Pesquisar "' + esc(ex.nome) + '" no Google</b></span>' + IC.chev + '</a>';
+    var termo = ex.Busca || ex.nome;
+    h += '<a class="google" href="https://www.google.com/search?q=' + encodeURIComponent(termo) + '" target="_blank" rel="noopener">' +
+      '<span>Ficou em dúvida?<b>Pesquisar "' + esc(termo) + '" no Google</b></span>' + IC.chev + '</a>';
     $cam.innerHTML = h + '</div>';
   }
 

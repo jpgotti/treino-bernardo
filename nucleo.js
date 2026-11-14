@@ -9,7 +9,7 @@
   var MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro',
     'outubro', 'novembro', 'dezembro'];
   var REGISTROS = { 'carga': 1, 'ajuda': 1, 'tempo': 1, 'nada': 1 };
-  var CAMPOS = ['Dose', 'Descanso', 'Registro', 'Imagem', 'Atenção', 'Evolução', 'Se não tiver'];
+  var CAMPOS = ['Dose', 'Descanso', 'Registro', 'Imagem', 'Busca', 'Atenção', 'Evolução', 'Se não tiver'];
 
   function erro(linha, msg) {
     var e = new Error('treino.md, linha ' + linha + ': ' + msg);

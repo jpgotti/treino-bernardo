@@ -1,5 +1,5 @@
 /* Funciona sem internet: guarda o app na primeira visita. O treino.md busca a versão nova quando há rede. */
-const VERSAO = 'treino-v2';
+const VERSAO = 'treino-v3';
 const BASE = ['./', 'index.html', 'app.css', 'app.js', 'nucleo.js', 'treino.md', 'manifest.webmanifest', 'icone-192.png', 'icone-512.png', 'icone-180.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(VERSAO).then(c => c.addAll(BASE)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => {
