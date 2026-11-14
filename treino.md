@@ -95,7 +95,7 @@ Imagem: figura-4
 Como fazer:
 1. Deite de barriga para cima, joelhos dobrados.
 2. Cruze o tornozelo direito por cima do joelho esquerdo, formando um "4".
-3. Segure atrás da coxa esquerda e puxe em direção ao peito, até sentir o glúteo direito esticar.
+3. Se já sentir o glúteo direito esticar assim, com o pé esquerdo no chão, fique nessa posição. Para alongar mais, tire o pé do chão, segure atrás da coxa esquerda e puxe em direção ao peito.
 4. Respire devagar e segure. Depois troque.
 
 #### Dorsiflexão com carga
