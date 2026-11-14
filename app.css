@@ -215,3 +215,16 @@ ol.steps li::before{content:counter(s);position:absolute;left:0;top:-1px;width:2
 .form input{display:block;min-width:0;max-width:100%;-webkit-appearance:none;appearance:none}
 .form input[type="date"]{line-height:var(--touch);text-align:left}
 .form input::-webkit-date-and-time-value{text-align:left}
+
+/* mobilidade: ações discretas */
+.btn.sm{height:36px;padding:0 14px;font-size:13.5px;border-radius:10px;position:relative}
+.btn.sm::after{content:"";position:absolute;inset:-4px}
+.acoes{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.marca{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;min-height:var(--touch);font-size:13.5px;font-weight:700;color:var(--ink-2)}
+.marca .bolinha{width:22px;height:22px;border-radius:50%;border:2px solid #B9B5AA;display:grid;place-items:center;box-sizing:border-box}
+.marca.ok{color:var(--accent)}
+.marca.ok .bolinha{background:var(--accent);border-color:var(--accent);color:#fff}
+.marca .bolinha svg{width:13px;height:13px}
+/* alça da folha: área de arrastar */
+.sheet-top{touch-action:none;cursor:grab;margin:-10px -16px 0;padding:10px 16px 0}
+.grab{width:44px;height:5px}

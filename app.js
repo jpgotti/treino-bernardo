@@ -141,10 +141,10 @@
     html += '<section class="sec"><div class="card' + (mf === mob.length ? ' done' : '') + '"><div class="row">' +
       (mf === mob.length ? '<div class="chk">' + IC.ok + '</div>' : '') +
       '<div class="t"><h3>1. Mobilidade</h3><p>' + mf + ' de ' + mob.length + ' · ~20 min</p></div>' +
-      (mf < mob.length ? '<button class="btn pri" data-guia="1">' + (mf ? 'Continuar' : 'Fazer guiada') + '</button>' : '') + '</div>' +
-      '<div class="sets"><button class="set um' + (mf === mob.length ? ' ok' : '') + '" data-mobfeita="1" aria-pressed="' + (mf === mob.length) + '">' +
-      (mf === mob.length ? 'Feita' : 'Marcar como feita') + '</button></div>' +
-      '<button class="lnk" data-mob="1">' + (V.abertoMob ? 'Fechar lista' : 'Ver a lista') + '</button></div>';
+      (mf < mob.length ? '<button class="btn pri sm" data-guia="1">' + (mf ? 'Continuar' : 'Fazer guiada') + '</button>' : '') + '</div>' +
+      '<div class="acoes"><button class="lnk" data-mob="1">' + (V.abertoMob ? 'Fechar lista' : 'Ver a lista') + '</button>' +
+      '<button class="marca' + (mf === mob.length ? ' ok' : '') + '" data-mobfeita="1" aria-pressed="' + (mf === mob.length) + '"><span class="bolinha">' +
+      (mf === mob.length ? IC.ok : '') + '</span>' + (mf === mob.length ? 'Feita' : 'Marcar como feita') + '</button></div></div>';
     if (V.abertoMob) mob.forEach(function (ex) { LISTA.push({ ex: ex, mob: true }); html += cardEx(ex, d, true, LISTA.length - 1); });
     html += '</section>';
 
@@ -298,8 +298,8 @@
   function desenharPerfil() {
     var velha = document.querySelector('.sheet.perfil'), sc = velha ? velha.scrollTop : 0;
     $cam.innerHTML = '<div class="scrim" data-fecharperfil="1"></div><div class="sheet perfil" role="dialog" aria-modal="true" aria-label="Perfil">' +
-      '<div class="grab"></div><div class="row" style="justify-content:space-between"><b style="font-size:17px">Perfil</b>' +
-      '<button class="icon" data-fecharperfil="1" aria-label="Fechar">' + IC.x + '</button></div>' + telaPerfil() + '</div>';
+      '<div class="sheet-top"><div class="grab"></div><div class="row" style="justify-content:space-between"><b style="font-size:17px">Perfil</b>' +
+      '<button class="icon" data-fecharperfil="1" aria-label="Fechar">' + IC.x + '</button></div></div>' + telaPerfil() + '</div>';
     var nova = document.querySelector('.sheet.perfil'); if (nova) nova.scrollTop = sc;
     var f = document.getElementById('f-np'); if (f) f.focus();
   }
@@ -312,8 +312,7 @@
         '<label for="f-alt">Altura (m)</label><input id="f-alt" inputmode="decimal" placeholder="ex.: 1,80">' +
         '<label for="f-nasc">Data de nascimento</label><input id="f-nasc" type="date">' +
         '<button class="btn pri full" style="margin-top:20px" data-salvarperfil="1">Salvar</button></div></section>';
-      return html;
-    }
+    } else {
     var p0 = E.peso[0], p1 = E.peso[E.peso.length - 1], dv = Math.round((p1.kg - p0.kg) * 10) / 10;
     html += '<div class="id"><div class="av">' + esc(T.titulo.replace(/^.* /, '').charAt(0)) + '</div><div><h1 style="font-size:26px">' +
       esc(T.titulo.replace(/^Treino d[oa] /, '')) + '</h1><p class="meta" style="margin:0">' + TB.idade(p.nasc, h) + ' anos · treinando desde ' + TB.dataCurta(T.inicio) + '</p></div></div>';
@@ -327,6 +326,8 @@
         return '<li><span>' + TB.dataCurta(x.d) + '</span><b>' + num(x.kg) + ' kg</b></li>'; }).join('') + '</ul></details>' : '') + '</div>' +
       '<div class="two"><div><small>Altura</small><b>' + num(p.altura) + ' m</b></div><div><small>Nascimento</small><b>' +
       p.nasc.split('-').reverse().join('/') + '</b></div></div>';
+
+    }
 
     // Esta semana
     var seg = TB.segundaDe(h), strip = '';
@@ -426,6 +427,30 @@
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape' || !$cam.innerHTML) return;
     if (G) fecharGuia(); else { V.perfil = false; V.editPeso = false; $cam.innerHTML = ''; }
+  });
+
+  /* Folha arrastável: puxar para baixo, com o conteúdo no topo, fecha. Vale para toda folha. */
+  var arr = null;
+  document.addEventListener('touchstart', function (e) {
+    var sh = e.target.closest('.sheet'); if (!sh) return;
+    var naAlca = !!e.target.closest('.grab,.sheet-top');
+    if (sh.scrollTop > 0 && !naAlca) return;
+    arr = { sh: sh, y0: e.touches[0].clientY, dy: 0 };
+    sh.style.transition = 'none';
+  }, { passive: true });
+  document.addEventListener('touchmove', function (e) {
+    if (!arr) return;
+    arr.dy = Math.max(0, e.touches[0].clientY - arr.y0);
+    if (arr.dy > 0) { arr.sh.style.transform = 'translateY(' + arr.dy + 'px)'; if (e.cancelable) e.preventDefault(); }
+  }, { passive: false });
+  document.addEventListener('touchend', function () {
+    if (!arr) return;
+    var sh = arr.sh, fecha = arr.dy > 110; arr = null;
+    sh.style.transition = 'transform .2s ease';
+    if (fecha) {
+      sh.style.transform = 'translateY(100%)';
+      setTimeout(function () { V.perfil = false; V.editPeso = false; $cam.innerHTML = ''; }, 180);
+    } else sh.style.transform = '';
   });
 
   /* ---------- início ---------- */
