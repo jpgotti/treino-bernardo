@@ -578,15 +578,32 @@ Como fazer:
 1. Sente com as costas apoiadas e as pernas abertas, com as almofadas pelo lado de dentro.
 2. Feche as pernas, segure 1 segundo e abra devagar.
 
-## Sábado — Opcional
+## Sábado — Livre
+
+Fim de semana é livre. O mais recomendado é descansar. Se quiser, faça a mobilidade (bem-vinda) ou um cardio longo e leve. Se treinar, conta como extra, nunca como falta.
 
 ### Cardio
 
 #### Longo e leve
 Dose: 45–90 min
 Registro: nada
-Imagem: cardio-leve
+Imagem: longo-leve
 Como fazer:
-1. Caminhada ou bike longa, no seu ritmo.
-2. Fique abaixo de 133 bpm.
-3. Faça só se der vontade. Conta como dia extra, nunca como falta.
+1. Caminhada ou bike longa, no ritmo de passeio.
+2. Não é a Z2 da quinta: é mais leve. Dá para conversar com folga o tempo todo.
+3. Se olhar o relógio, fique abaixo de 133 bpm.
+
+## Domingo — Livre
+
+Fim de semana é livre. O mais recomendado é descansar. Se quiser, faça a mobilidade (bem-vinda) ou um cardio longo e leve. Se treinar, conta como extra, nunca como falta.
+
+### Cardio
+
+#### Longo e leve
+Dose: 45–90 min
+Registro: nada
+Imagem: longo-leve
+Como fazer:
+1. Caminhada ou bike longa, no ritmo de passeio.
+2. Não é a Z2 da quinta: é mais leve. Dá para conversar com folga o tempo todo.
+3. Se olhar o relógio, fique abaixo de 133 bpm.

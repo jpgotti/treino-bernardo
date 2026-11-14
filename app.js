@@ -104,7 +104,8 @@
       h += '</div>';
     }
     if (/tiros/i.test(ex.nome)) h += zona([[0, 114, ''], [114, 133, 'Leve ≤133', 'calm'], [133, 162, ''], [162, FCMAX, 'Tiro 162–180', 'hot']], [133, 162]);
-    if (/z2|longo/i.test(ex.nome)) h += zona([[100, 114, ''], [114, 133, 'Z2 114–133', 'calm'], [133, FCMAX, '']], [114, 133]);
+    if (/z2/i.test(ex.nome)) h += zona([[100, 114, ''], [114, 133, 'Z2 114–133', 'calm'], [133, FCMAX, '']], [114, 133]);
+    if (/longo/i.test(ex.nome)) h += zona([[100, 133, 'Leve, abaixo de 133', 'calm'], [133, FCMAX, '']], [133]);
     return h + '</div>';
   }
 
