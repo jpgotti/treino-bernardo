@@ -205,12 +205,6 @@
     L.push('Frequência: ' + fq.feitos + ' feitos, ' + fq.furados + ' furados' +
       (fq.aproveitamento === null ? '' : ', ' + fq.aproveitamento + '% de aproveitamento') +
       (fq.extras ? ', ' + fq.extras + ' extra' + (fq.extras > 1 ? 's' : '') : ''));
-    var p = est.peso || [];
-    if (p.length) {
-      L.push('Peso: inicial ' + num(p[0].kg) + ' kg (' + dataCurta(p[0].d) + '), atual ' +
-        num(p[p.length - 1].kg) + ' kg (' + dataCurta(p[p.length - 1].d) + ')');
-      L.push('Histórico de peso: ' + p.map(function (x) { return dataCurta(x.d) + ' ' + num(x.kg); }).join(' · '));
-    }
     var nomes = {};
     [t.mobilidade].concat(Object.keys(t.dias).reduce(function (a, d) {
       return a.concat(Object.keys(t.dias[d]).map(function (k) { return t.dias[d][k]; }));

@@ -62,6 +62,14 @@
     return { feitos: f, total: it.length };
   }
 
+  /* Concluir (ou desfazer) um dia marca (ou desmarca) todos os itens dele. Vale para o botão e para a semana do perfil. */
+  function marcarDia(data, feitoDia) {
+    if (feitoDia) E.dias[data] = true; else delete E.dias[data];
+    E.checks[data] = E.checks[data] || {};
+    itensDoDia(data).forEach(function (x) { E.checks[data][x.ex.id] = Array(TB.numSeries(T, x.ex, data, x.mob)).fill(feitoDia); });
+    salvar();
+  }
+
   function regDe(id) { return E.reg[id] = E.reg[id] || []; }
   function setReg(id, data, v) {
     var l = regDe(id).filter(function (x) { return x.d !== data; });
@@ -303,6 +311,12 @@
       TB.dataCurta(h) + '</span></div><div class="strip">' + strip + '</div></div>';
 
     // 2) Frequência total
+    if (h < T.inicio) {
+      html += '<div class="sech" style="padding-top:20px"><h2>Frequência total</h2></div><div class="card pad"><p class="nota" style="margin:0">' +
+        'A contagem começa na ' + TB.dataLonga(T.inicio).toLowerCase() + '. Dias marcados antes disso aparecem em "Esta semana", mas não entram no total.</p></div>' +
+        '<button class="btn pri full" style="margin-top:14px" data-enviar="1">Enviar resumo ao JP</button>';
+      return html + '</section>';
+    }
     var fq = TB.frequencia(T, E.dias, h), sems = fq.semanas.slice(-8), base = fq.semanas.length - sems.length;
     html += '<div class="sech" style="padding-top:20px"><h2>Frequência total</h2><span>' + fq.semanas.length + ' semana' + (fq.semanas.length > 1 ? 's' : '') +
       (fq.extras ? ' · ' + fq.extras + ' extra' + (fq.extras > 1 ? 's' : '') : '') + '</span></div>' +
@@ -319,23 +333,7 @@
       IC.ok + '</i>Extra</span><span><i class="dot h"></i>Hoje</span></div></div>' +
       '<button class="btn pri full" style="margin-top:4px" data-enviar="1">Enviar resumo ao JP</button>';
 
-    // 3) Peso, enxuto, no fim
-    var temPeso = E.peso.length > 0, editar = V.editPeso || !temPeso;
-    html += '<div class="card peso-linha">';
-    if (temPeso) {
-      var p0 = E.peso[0], p1 = E.peso[E.peso.length - 1], dv = Math.round((p1.kg - p0.kg) * 10) / 10;
-      html += '<div class="row"><div class="t"><small>Peso · ' + TB.dataCurta(p1.d) + '</small><b>' + num(p1.kg) + ' kg</b>' +
-        (E.peso.length > 1 ? '<span class="var">' + (dv > 0 ? '+' : dv < 0 ? '−' : '') + num(Math.abs(dv)) + ' kg desde ' + TB.dataCurta(p0.d) + '</span>' : '') +
-        '</div>' + (editar ? '' : '<button class="lnk" data-peso="1">Atualizar</button>') + '</div>';
-    }
-    if (editar) {
-      html += '<div class="form novo-peso' + (temPeso ? '' : ' primeiro') + '"><label for="f-np">' + (temPeso ? 'Peso de hoje (kg)' : 'Seu peso (kg) · fica só neste celular') +
-        '</label><div class="peso-in"><input id="f-np" inputmode="decimal" placeholder="ex.: 80,5">' +
-        (temPeso ? '<button class="btn sec2" data-cancelarpeso="1">Cancelar</button>' : '') + '<button class="btn pri" data-salvarpeso="1">Salvar</button></div></div>';
-    }
-    if (E.peso.length > 1) html += '<details class="hist"><summary class="lnk">Histórico de peso</summary><ul>' + E.peso.slice().reverse().map(function (x) {
-      return '<li><span>' + TB.dataCurta(x.d) + '</span><b>' + num(x.kg) + ' kg</b></li>'; }).join('') + '</ul></details>';
-    return html + '</div></section>';
+    return html + '</section>';
   }
 
   function lerNum(v) { return parseFloat(String(v).replace(',', '.')); }
@@ -377,22 +375,13 @@
       render(); return;
     }
     if (ds.pular) { clearInterval(timer); var dk = document.getElementById('dock'); if (dk) dk.remove(); return; }
-    if (ds.concluir) {
-      if (ds.concluir === '1') {
-        E.dias[V.dia] = true; E.checks[V.dia] = E.checks[V.dia] || {};
-        itensDoDia(V.dia).forEach(function (x) { E.checks[V.dia][x.ex.id] = Array(TB.numSeries(T, x.ex, V.dia, x.mob)).fill(true); });
-      } else {
-        delete E.dias[V.dia]; E.checks[V.dia] = E.checks[V.dia] || {};
-        itensDoDia(V.dia).forEach(function (x) { E.checks[V.dia][x.ex.id] = Array(TB.numSeries(T, x.ex, V.dia, x.mob)).fill(false); });
-      }
-      salvar(); render(); return;
-    }
+    if (ds.concluir) { marcarDia(V.dia, ds.concluir === '1'); render(); return; }
     if (ds.guia) { abrirGuia(); return; }
     if (ds.gfechar) { fecharGuia(); return; }
     if (ds.g === 'voltar') { guiaIr(G.i - 1); return; }
     if (ds.g === 'pular') { guiaIr(G.i + 1); return; }
     if (ds.g === 'feito') { guiaFeito(); return; }
-    if (ds.toggle) { if (E.dias[ds.toggle]) delete E.dias[ds.toggle]; else E.dias[ds.toggle] = true; salvar(); render(); return; }
+    if (ds.toggle) { marcarDia(ds.toggle, !E.dias[ds.toggle]); render(); return; }
     if (ds.peso) { V.editPeso = true; desenharPerfil(); return; }
     if (ds.salvarpeso) {
       var v = lerNum(document.getElementById('f-np').value);
