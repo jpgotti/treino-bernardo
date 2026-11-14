@@ -381,7 +381,10 @@
       if (ds.concluir === '1') {
         E.dias[V.dia] = true; E.checks[V.dia] = E.checks[V.dia] || {};
         itensDoDia(V.dia).forEach(function (x) { E.checks[V.dia][x.ex.id] = Array(TB.numSeries(T, x.ex, V.dia, x.mob)).fill(true); });
-      } else delete E.dias[V.dia];
+      } else {
+        delete E.dias[V.dia]; E.checks[V.dia] = E.checks[V.dia] || {};
+        itensDoDia(V.dia).forEach(function (x) { E.checks[V.dia][x.ex.id] = Array(TB.numSeries(T, x.ex, V.dia, x.mob)).fill(false); });
+      }
       salvar(); render(); return;
     }
     if (ds.guia) { abrirGuia(); return; }
