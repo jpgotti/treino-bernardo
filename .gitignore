@@ -3,3 +3,4 @@ mocks/
 .DS_Store
 img/piloto/
 .claude/
+img/*.png
