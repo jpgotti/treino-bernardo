@@ -1,8 +1,8 @@
-# Refazer: só a prancha lateral (3ª tentativa)
+# Pedido: prancha lateral (3ª tentativa) e imagem nova da puxada aberta
 
 Mesmas regras de `img/BRIEFING.md` (estilo, formato 3:2 1536 × 1024, fundo `#F4F2ED`, sunga cinza-clara, só músculo
 superficial, figura dentro do quadrado central, sem texto). Modelo de estilo: `img/stiff-unilateral.png`.
-Salvar em `img/prancha-lateral.png`, sobrescrevendo. Não mexer em nenhuma outra imagem.
+Salvar a prancha em `img/prancha-lateral.png`, sobrescrevendo, e a puxada em `img/puxada-aberta.png` (seção no fim). Não mexer em nenhuma outra imagem.
 
 ## O que deu errado nas duas tentativas
 
@@ -26,3 +26,12 @@ Prancha lateral de iniciante (apoio nos joelhos), na posição sustentada:
 
 Antes de salvar, confira: existe espaço vazio entre o quadril e o chão? Se a coxa ou o quadril estiverem encostados,
 refaça. Se depois de 3 tentativas não sair, anote em `img/PENDENCIAS.md`.
+
+
+# Imagem nova: `puxada-aberta.png` (a academia não tem gravitron)
+
+Mesmas regras de `img/BRIEFING.md`. Puxada na polia alta com pegada aberta (lat pulldown): sentado na máquina, coxas
+presas sob o apoio acolchoado, mãos na barra longa bem mais abertas que os ombros, palmas para a frente, **barra puxada
+até a altura do queixo, na frente do rosto (nunca atrás da nuca)**, cotovelos para baixo e para trás, peito alto,
+tronco levemente inclinado para trás. Vista três-quartos de frente, para o dorsal e o bíceps aparecerem.
+Destaque: latíssimo do dorso e bíceps. Salvar em `img/puxada-aberta.png`.

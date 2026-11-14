@@ -184,20 +184,18 @@ Como fazer:
 2. Sem dobrar os braços, deixe o peito descer um pouco, aproximando as escápulas.
 3. Depois empurre o chão, afastando as escápulas e arredondando levemente o alto das costas.
 
-#### Barra fixa no gravitron
-Dose: 4 × 6–8
+#### Puxada aberta na polia
+Dose: 4 × 8–10
 Descanso: 90 s
-Registro: ajuda
-Imagem: gravitron
-Busca: assisted pull up machine
+Registro: carga
+Imagem: puxada-aberta
+Busca: wide grip lat pulldown
 Como fazer:
-1. Escolha a ajuda: quanto mais peso na máquina, mais ela empurra você para cima.
-2. Ajoelhe na plataforma e segure as alças com as palmas viradas uma para a outra.
-3. Puxe o peito em direção à barra, ombros longe das orelhas, até o queixo passar das mãos.
-4. Desça devagar, em 2 a 3 segundos, até esticar os braços.
-Atenção: sem balançar o corpo. Menos ajuda = mais forte.
-Evolução: fez 4 × 8 em todas as séries? Tire um pouco de ajuda. A pegada evolui de neutra para supinada e, depois, para aberta.
-Se não tiver: puxada na polia alta com pegada neutra, mesma dose, e aumente a carga no lugar de tirar a ajuda.
+1. Sente na máquina com as coxas presas embaixo do apoio e segure a barra com as mãos bem mais abertas que os ombros, palmas para a frente.
+2. Com o peito alto e o tronco levemente inclinado para trás, puxe a barra até a altura do queixo, levando os cotovelos para baixo e para trás.
+3. Volte devagar, em 2 a 3 segundos, até esticar os braços.
+Atenção: sem jogar o tronco para trás para ajudar, e nunca puxar atrás da nuca.
+Evolução: aumente a carga aos poucos. A meta é a barra fixa livre: quando a carga chegar perto do seu peso, comece a tentar a barra.
 
 #### Remada unilateral com halter
 Dose: 3 × 8–10 por lado

@@ -94,7 +94,7 @@
 
   function cardEx(ex, data, mob, idx) {
     var n = TB.numSeries(T, ex, data, mob), a = checks(data, ex, n), ok = a.every(Boolean);
-    var meta = esc(ex.Dose) + (ex.Descanso ? ' · descanso ' + esc(ex.Descanso) : '');
+    var meta = esc(TB.doseDoDia(T, ex, data, mob)) + (ex.Descanso ? ' · descanso ' + esc(ex.Descanso) : '');
     var temZona = /tiros|z2|longo/i.test(ex.nome);
     var h = '<div class="card' + (ok ? ' done' : '') + (temZona ? ' pad' : '') + '" data-ex="' + idx + '">';
     h += '<div class="row"><button class="abre" data-abre="' + idx + '">' + img(ex) +
@@ -150,7 +150,8 @@
     html += '<section class="hero"><p class="eyebrow">' + TB.dataLonga(d) + (d === h ? ' · hoje' : '') + ' · semana ' + sem + '</p>' +
       '<h1>' + esc(nome) + '</h1>' + (s && s.nota ? '<p class="nota">' + esc(s.nota.replace(/Vale nas semanas.*$/, '').trim() || '') + '</p>' : '') +
       '<div class="bar"><span style="width:' + Math.round(100 * pr.feitos / pr.total) + '%"></span></div>' +
-      '<p class="small">' + pr.feitos + ' de ' + pr.total + ' itens</p></section>';
+      '<p class="small">' + pr.feitos + ' de ' + pr.total + ' itens</p>' +
+      (s && TB.indiceSemana(T, d) < 2 ? '<p class="nota">Semanas 1 e 2: uma série a menos nos exercícios de 3 ou mais, para o corpo se acostumar.</p>' : '') + '</section>';
     if (!s) html += '<section class="sec"><p class="nota" style="padding:0 4px 8px">' +
       (TB.diaSemana(d) === 7 ? 'Domingo é livre. Se quiser, faça a mobilidade. Se treinar, conta como extra.' : 'Sem treino marcado para hoje.') + '</p></section>';
 
@@ -187,7 +188,7 @@
     h += '<div class="scrim" data-fechar="1"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="' + esc(ex.nome) + '">' +
       '<div class="grab"></div><div class="row" style="justify-content:space-between;align-items:flex-start"><h1>' + esc(ex.nome) + '</h1>' +
       '<button class="icon" data-fechar="1" aria-label="Fechar">' + IC.x + '</button></div>' +
-      '<div class="chips"><span class="chip">' + esc(ex.Dose) + '</span>' + (ex.Descanso ? '<span class="chip">Descanso ' + esc(ex.Descanso) + '</span>' : '') + '</div>' +
+      '<div class="chips"><span class="chip">' + esc(TB.doseDoDia(T, ex, V.dia, item.mob)) + '</span>' + (ex.Descanso ? '<span class="chip">Descanso ' + esc(ex.Descanso) + '</span>' : '') + '</div>' +
       img(ex, 'big') + '<h2 class="h">Como fazer</h2><ol class="steps">' +
       ex.passos.map(function (p) { return '<li>' + md(p) + '</li>'; }).join('') + '</ol>';
     if (ex['Atenção']) h += '<p class="note">' + md(cap(ex['Atenção'])) + '</p>';
@@ -236,7 +237,7 @@
       '<div class="segs" style="grid-template-columns:repeat(' + mob.length + ',1fr)">' + segs + '</div>' +
       '<div style="padding:0 16px">' + img(ex, 'big') + '</div>' +
       '<div style="padding:16px 20px 0;text-align:center"><h1 style="font-size:24px;letter-spacing:-.4px">' + esc(ex.nome) + '</h1></div>' +
-      '<p class="dose-g">' + esc(ex.Dose) + '</p>' +
+      '<p class="dose-g">' + esc(TB.doseDoDia(T, ex, V.dia, true)) + '</p>' +
       (tempo ? '<p class="nota" style="text-align:center;margin:0 20px">Acompanhe o tempo no seu relógio.</p>' : '') +
       '<ol class="steps" style="padding:14px 20px 0">' + ex.passos.map(function (p) { return '<li>' + md(p) + '</li>'; }).join('') + '</ol>';
     if (ex['Atenção']) h += '<p class="note" style="margin:10px 20px 0">' + md(cap(ex['Atenção'])) + '</p>';

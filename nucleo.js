@@ -150,6 +150,10 @@
     if (!mobilidade && n >= 3 && indiceSemana(t, s) < 2) n -= 1;
     return n;
   }
+  /* Dose como aparece na tela: o número de séries é o da semana (nas semanas 1 e 2, uma a menos). */
+  function doseDoDia(t, ex, s, mobilidade) {
+    return String(ex.Dose).replace(/^(\d+)(\s*×)/, function (_, x, r) { return numSeries(t, ex, s, mobilidade) + r; });
+  }
   function descansoSeg(ex) { var m = String(ex.Descanso || '').match(/(\d+)\s*s/); return m ? +m[1] : 0; }
 
   /* Tempo do modo guiado: "60 s por lado" → {s:60, lados:2}; "1 × 30–45 s" → {s:30, lados:1}. */
@@ -224,7 +228,7 @@
   var api = {
     lerTreino: lerTreino, slug: slug, iso: iso, somaDias: somaDias, diaSemana: diaSemana, segundaDe: segundaDe,
     dataLonga: dataLonga, dataCurta: dataCurta, indiceSemana: indiceSemana, variantePerna: variantePerna,
-    sessaoDoDia: sessaoDoDia, numSeries: numSeries, descansoSeg: descansoSeg, tempoGuiado: tempoGuiado,
+    sessaoDoDia: sessaoDoDia, numSeries: numSeries, doseDoDia: doseDoDia, descansoSeg: descansoSeg, tempoGuiado: tempoGuiado,
     estadoDia: estadoDia, frequencia: frequencia, idade: idade, ultimoAntes: ultimoAntes, resumo: resumo,
     NOMES_DIA: NOMES_DIA, CURTO_DIA: CURTO_DIA
   };
