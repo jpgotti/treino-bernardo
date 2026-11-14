@@ -195,3 +195,23 @@ ol.steps li::before{content:counter(s);position:absolute;left:0;top:-1px;width:2
 .orient li{list-style:none;padding:12px 0;border-top:1px solid var(--line);font-size:14.5px;line-height:1.5}
 .orient li:first-child{border-top:0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* cabeçalho: avatar + nome + seta, deixa claro que abre o perfil */
+.perfil-btn{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:var(--touch);padding:4px 10px 4px 4px;margin-left:-4px;border-radius:99px}
+.perfil-btn:active{background:var(--line)}
+.perfil-btn .av.sm{width:40px;height:40px;font-size:17px}
+.perfil-btn .pt{display:flex;flex-direction:column;line-height:1.15}
+.perfil-btn .pt b{font-size:16px;font-weight:800}
+.perfil-btn .pt small{font-size:12px;color:var(--ink-3);font-weight:600}
+.perfil-btn>svg{width:18px;height:18px;color:var(--ink-3);margin-left:2px}
+/* perfil como folha por cima do treino */
+.sheet.perfil{padding-left:16px;padding-right:16px}
+.sheet .sec{padding:4px 0 10px}
+.sheet .id{padding:12px 4px 22px}
+.novo-peso{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.novo-peso label{margin-top:0}
+.two-btn{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+/* campo de data não estoura a caixa (iOS dá largura própria ao input de data) */
+.form input{display:block;min-width:0;max-width:100%;-webkit-appearance:none;appearance:none}
+.form input[type="date"]{line-height:var(--touch);text-align:left}
+.form input::-webkit-date-and-time-value{text-align:left}

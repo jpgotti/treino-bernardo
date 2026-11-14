@@ -8,6 +8,7 @@
     no: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"/></svg>',
     info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>',
     x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
     voltar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>'
   };
 
@@ -123,7 +124,9 @@
   function telaHoje() {
     var d = V.dia, h = hoje(), s = TB.sessaoDoDia(T, d), sem = TB.indiceSemana(T, d) + 1, pr = progresso(d);
     LISTA = [];
-    var html = '<header class="top"><button class="brand" data-ir="perfil" aria-label="Abrir perfil">' + esc(T.titulo) + '</button>' +
+    var nomeP = T.titulo.replace(/^Treino d[oa] /, '');
+    var html = '<header class="top"><button class="perfil-btn" data-perfil="1" aria-label="Abrir perfil e frequência"><span class="av sm">' +
+      esc(nomeP.charAt(0)) + '</span><span class="pt"><b>' + esc(nomeP) + '</b><small>Perfil e frequência</small></span>' + IC.chev + '</button>' +
       '<button class="icon" data-ir="orient" aria-label="Orientações">' + IC.info + '</button></header>' + semanaTopo();
     var nome = s ? s.nome : (TB.diaSemana(d) === 7 ? 'Descanso' : 'Livre');
     html += '<section class="hero"><p class="eyebrow">' + TB.dataLonga(d) + (d === h ? ' · hoje' : '') + ' · semana ' + sem + '</p>' +
@@ -138,7 +141,9 @@
     html += '<section class="sec"><div class="card' + (mf === mob.length ? ' done' : '') + '"><div class="row">' +
       (mf === mob.length ? '<div class="chk">' + IC.ok + '</div>' : '') +
       '<div class="t"><h3>1. Mobilidade</h3><p>' + mf + ' de ' + mob.length + ' · ~20 min</p></div>' +
-      '<button class="btn pri" data-guia="1">' + (mf ? 'Continuar' : 'Fazer guiada') + '</button></div>' +
+      (mf < mob.length ? '<button class="btn pri" data-guia="1">' + (mf ? 'Continuar' : 'Fazer guiada') + '</button>' : '') + '</div>' +
+      '<div class="sets"><button class="set um' + (mf === mob.length ? ' ok' : '') + '" data-mobfeita="1" aria-pressed="' + (mf === mob.length) + '">' +
+      (mf === mob.length ? 'Feita' : 'Marcar como feita') + '</button></div>' +
       '<button class="lnk" data-mob="1">' + (V.abertoMob ? 'Fechar lista' : 'Ver a lista') + '</button></div>';
     if (V.abertoMob) mob.forEach(function (ex) { LISTA.push({ ex: ex, mob: true }); html += cardEx(ex, d, true, LISTA.length - 1); });
     html += '</section>';
@@ -290,8 +295,16 @@
   function fecharGuia() { if (G) clearInterval(G.int); G = null; $cam.innerHTML = ''; render(); }
 
   /* ---------- perfil ---------- */
+  function desenharPerfil() {
+    var velha = document.querySelector('.sheet.perfil'), sc = velha ? velha.scrollTop : 0;
+    $cam.innerHTML = '<div class="scrim" data-fecharperfil="1"></div><div class="sheet perfil" role="dialog" aria-modal="true" aria-label="Perfil">' +
+      '<div class="grab"></div><div class="row" style="justify-content:space-between"><b style="font-size:17px">Perfil</b>' +
+      '<button class="icon" data-fecharperfil="1" aria-label="Fechar">' + IC.x + '</button></div>' + telaPerfil() + '</div>';
+    var nova = document.querySelector('.sheet.perfil'); if (nova) nova.scrollTop = sc;
+    var f = document.getElementById('f-np'); if (f) f.focus();
+  }
   function telaPerfil() {
-    var h = hoje(), p = E.perfil, html = '<div class="back"><button class="icon" data-ir="hoje" aria-label="Voltar">' + IC.voltar + '</button><b>Perfil</b></div>';
+    var h = hoje(), p = E.perfil, html = '';
     if (!p.altura || !p.nasc || !E.peso.length) {
       html += '<section class="sec"><div class="card pad form"><h2 style="font-size:18px">Seus dados</h2>' +
         '<p class="nota">Ficam só neste celular.</p>' +
@@ -299,13 +312,15 @@
         '<label for="f-alt">Altura (m)</label><input id="f-alt" inputmode="decimal" placeholder="ex.: 1,80">' +
         '<label for="f-nasc">Data de nascimento</label><input id="f-nasc" type="date">' +
         '<button class="btn pri full" style="margin-top:20px" data-salvarperfil="1">Salvar</button></div></section>';
-      $app.innerHTML = html; return;
+      return html;
     }
     var p0 = E.peso[0], p1 = E.peso[E.peso.length - 1], dv = Math.round((p1.kg - p0.kg) * 10) / 10;
     html += '<div class="id"><div class="av">' + esc(T.titulo.replace(/^.* /, '').charAt(0)) + '</div><div><h1 style="font-size:26px">' +
       esc(T.titulo.replace(/^Treino d[oa] /, '')) + '</h1><p class="meta" style="margin:0">' + TB.idade(p.nasc, h) + ' anos · treinando desde ' + TB.dataCurta(T.inicio) + '</p></div></div>';
     html += '<section class="sec"><div class="card pad"><div class="wt"><div><small>Peso atual · ' + TB.dataCurta(p1.d) + '</small><b>' + num(p1.kg) + ' kg</b></div>' +
-      '<button class="btn sec2" data-peso="1">Atualizar</button></div>' +
+      (V.editPeso ? '' : '<button class="btn sec2" data-peso="1">Atualizar</button>') + '</div>' +
+      (V.editPeso ? '<div class="form novo-peso"><label for="f-np">Peso de hoje (kg)</label><input id="f-np" inputmode="decimal" placeholder="ex.: 80,5">' +
+        '<div class="two-btn"><button class="btn sec2" data-cancelarpeso="1">Cancelar</button><button class="btn pri" data-salvarpeso="1">Salvar</button></div></div>' : '') +
       '<div class="wh"><div><small>Inicial · ' + TB.dataCurta(p0.d) + '</small><b>' + num(p0.kg) + ' kg</b></div><div><small>Variação</small><b style="color:var(--accent)">' +
       (dv > 0 ? '+' : dv < 0 ? '−' : '') + num(Math.abs(dv)) + ' kg</b></div><div><small>Registros</small><b>' + E.peso.length + '</b></div></div>' +
       (E.peso.length > 1 ? '<details class="hist"><summary class="lnk">Ver histórico</summary><ul>' + E.peso.slice().reverse().map(function (x) {
@@ -341,15 +356,9 @@
     html += '</div><div class="leg"><span><i class="dot f">' + IC.ok + '</i>Feito</span><span><i class="dot x">' + IC.no + '</i>Furou</span><span><i class="dot s">' +
       IC.ok + '</i>Extra</span><span><i class="dot h"></i>Hoje</span></div></div>' +
       '<button class="btn pri full" style="margin-top:4px" data-enviar="1">Enviar resumo ao JP</button></section>';
-    $app.innerHTML = html;
+    return html;
   }
 
-  function folhaPeso() {
-    $cam.innerHTML = '<div class="scrim" data-fechar="1"></div><div class="sheet form" style="top:auto;border-radius:24px 24px 0 0">' +
-      '<div class="grab"></div><h1 style="font-size:22px">Atualizar peso</h1><label for="f-np">Peso de hoje (kg)</label>' +
-      '<input id="f-np" inputmode="decimal" placeholder="ex.: 80,5"><button class="btn pri full" style="margin-top:16px" data-salvarpeso="1">Salvar</button></div>';
-    var i = document.getElementById('f-np'); if (i) i.focus();
-  }
   function lerNum(v) { return parseFloat(String(v).replace(',', '.')); }
 
   /* ---------- orientações ---------- */
@@ -359,18 +368,28 @@
   }
 
   function render() {
-    if (V.tela === 'perfil') telaPerfil(); else if (V.tela === 'orient') telaOrient(); else telaHoje();
+    if (V.tela === 'orient') telaOrient(); else telaHoje();
+    if (V.perfil) desenharPerfil();
   }
 
   /* ---------- eventos ---------- */
   document.addEventListener('click', function (e) {
-    var b = e.target.closest('button,[data-fechar],summary'); if (!b) return;
+    var b = e.target.closest('button,[data-fechar],[data-fecharperfil],summary'); if (!b) return;
     var ds = b.dataset;
     if (ds.ir) { V.tela = ds.ir; render(); scrollTo(0, 0); return; }
     if (ds.dia) { V.dia = ds.dia; render(); return; }
     if (ds.mob) { V.abertoMob = !V.abertoMob; render(); return; }
     if (ds.abre) { abrirDetalhe(LISTA[+ds.abre]); return; }
     if (ds.fechar) { $cam.innerHTML = ''; return; }
+    if (ds.perfil) { V.perfil = true; desenharPerfil(); return; }
+    if (ds.fecharperfil) { V.perfil = false; V.editPeso = false; $cam.innerHTML = ''; return; }
+    if (ds.mobfeita) {
+      var mob = T.mobilidade.blocos[0].itens, todos = mob.every(function (x) { return feito(V.dia, x, TB.numSeries(T, x, V.dia, true)); });
+      E.checks[V.dia] = E.checks[V.dia] || {};
+      mob.forEach(function (x) { E.checks[V.dia][x.id] = Array(TB.numSeries(T, x, V.dia, true)).fill(!todos); });
+      salvar(); render(); return;
+    }
+    if (ds.cancelarpeso) { V.editPeso = false; desenharPerfil(); return; }
     if (ds.set) {
       var p = ds.set.split(':'), it = LISTA[+p[0]], n = TB.numSeries(T, it.ex, V.dia, it.mob), on = setCheck(V.dia, it.ex, n, +p[1]);
       var seg = TB.descansoSeg(it.ex);
@@ -385,12 +404,12 @@
     if (ds.g === 'pular') { guiaIr(G.i + 1); return; }
     if (ds.g === 'meio') { guiaMeio(); return; }
     if (ds.toggle) { if (E.dias[ds.toggle]) delete E.dias[ds.toggle]; else E.dias[ds.toggle] = true; salvar(); render(); return; }
-    if (ds.peso) { folhaPeso(); return; }
+    if (ds.peso) { V.editPeso = true; desenharPerfil(); return; }
     if (ds.salvarpeso) {
       var v = lerNum(document.getElementById('f-np').value);
       if (!(v > 20 && v < 300)) { alert('Confira o peso: use só números, como 80,5.'); return; }
       var hj = hoje(); E.peso = E.peso.filter(function (x) { return x.d !== hj; }); E.peso.push({ d: hj, kg: v });
-      E.peso.sort(function (a, c) { return a.d < c.d ? -1 : 1; }); salvar(); $cam.innerHTML = ''; render(); return;
+      E.peso.sort(function (a, c) { return a.d < c.d ? -1 : 1; }); V.editPeso = false; salvar(); render(); return;
     }
     if (ds.salvarperfil) {
       var pe = lerNum(document.getElementById('f-peso').value), al = lerNum(document.getElementById('f-alt').value), na = document.getElementById('f-nasc').value;
@@ -404,7 +423,10 @@
     var i = e.target.dataset && e.target.dataset.reg; if (i === undefined) return;
     var v = lerNum(e.target.value); setReg(LISTA[+i].ex.id, V.dia, isNaN(v) ? '' : v); render();
   });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $cam.innerHTML) { if (G) fecharGuia(); else $cam.innerHTML = ''; } });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape' || !$cam.innerHTML) return;
+    if (G) fecharGuia(); else { V.perfil = false; V.editPeso = false; $cam.innerHTML = ''; }
+  });
 
   /* ---------- início ---------- */
   fetch('treino.md', { cache: 'no-cache' }).then(function (r) {
