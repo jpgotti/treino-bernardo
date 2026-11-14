@@ -228,3 +228,21 @@ ol.steps li::before{content:counter(s);position:absolute;left:0;top:-1px;width:2
 /* alça da folha: área de arrastar */
 .sheet-top{touch-action:none;cursor:grab;margin:-10px -16px 0;padding:10px 16px 0}
 .grab{width:44px;height:5px}
+
+/* séries: bolinhas cumulativas (tocar na 3 marca 1, 2 e 3) */
+.series{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
+.series>span{font-size:13px;font-weight:700;color:var(--ink-3)}
+.pills{display:flex;gap:10px}
+.pill{width:var(--touch);height:var(--touch);border-radius:50%;border:2px solid #B9B5AA;background:#fff;font-weight:800;font-size:15px;color:var(--ink-2);display:grid;place-items:center;padding:0}
+.pill.ok{background:var(--accent);border-color:var(--accent);color:#fff}
+.pill svg{width:18px;height:18px}
+.card .acoes{margin-top:8px}
+/* WhatsApp nas orientações */
+.back{justify-content:flex-start}
+.zap{margin-left:auto;display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:99px;background:#1F6F50;color:#fff;font-weight:700;font-size:13.5px;text-decoration:none}
+.zap svg{width:18px;height:18px}
+/* sem zoom no toque duplo */
+html,body{touch-action:manipulation}
+
+/* com a imagem carregada, some o listrado de "sem imagem" */
+.ph:has(img){background:var(--bg)}

@@ -9,6 +9,7 @@ Se o app não conseguir ler, ele mostra a linha com problema em vez de abrir pel
 
 # Treino do Bernardo
 
+WhatsApp do JP:
 Início: segunda, 16/11/2026. Troca de bloco prevista para meados de janeiro (~8 semanas).
 
 ## Orientações gerais
@@ -98,14 +99,14 @@ Como fazer:
 3. Se já sentir o glúteo direito esticar assim, com o pé esquerdo no chão, fique nessa posição. Para alongar mais, tire o pé do chão, segure atrás da coxa esquerda e puxe em direção ao peito.
 4. Respire devagar e segure. Depois troque.
 
-#### Dorsiflexão com carga
+#### Dorsiflexão de tornozelo
 Dose: 1 × 10 por lado
 Registro: nada
 Imagem: dorsiflexao
 Como fazer:
-1. Fique com um pé à frente, perto de um banco ou parede para se apoiar.
-2. Apoie um halter ou anilha em cima do joelho da frente.
-3. Leve o joelho para a frente, passando da ponta do pé, sem tirar o calcanhar do chão.
+1. De frente para uma parede, com as mãos apoiadas nela e um pé à frente, a ponta do pé a um palmo da parede.
+2. Leve o joelho da frente em direção à parede, sem tirar o calcanhar do chão. O peso do corpo já basta.
+3. Encostou fácil? Afaste um pouco o pé. Não encostou? Aproxime.
 4. Volte e repita. Depois troque de perna.
 
 #### Alongamento do flexor do quadril, ajoelhado

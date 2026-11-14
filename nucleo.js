@@ -27,7 +27,7 @@
     // Comentários viram linhas em branco, para a numeração continuar batendo com o arquivo.
     md = md.replace(/<!--[\s\S]*?-->/g, function (m) { return m.replace(/[^\n]/g, ''); });
     var linhas = md.split('\n');
-    var t = { titulo: '', inicio: null, orientacoes: [], mobilidade: null, dias: {} };
+    var t = { titulo: '', whatsapp: '', inicio: null, orientacoes: [], mobilidade: null, dias: {} };
     var secao = null, bloco = null, ex = null, emLista = false;
 
     function fecharEx(n) {
@@ -44,6 +44,11 @@
       if (!ln.trim()) { continue; }
       var m;
       if ((m = ln.match(/^# (.+)$/))) { t.titulo = m[1].trim(); continue; }
+      if ((m = ln.match(/^WhatsApp do JP:\s*(.*)$/))) {
+        var dig = m[1].replace(/\D/g, '');
+        if (m[1].trim() && !/^\d{12,13}$/.test(dig)) throw erro(n, 'WhatsApp do JP precisa ter DDI e DDD, como 55 21 99999-9999');
+        t.whatsapp = dig; continue;
+      }
       if ((m = ln.match(/^Início: .*?(\d{2})\/(\d{2})\/(\d{4})/))) {
         t.inicio = m[3] + '-' + m[2] + '-' + m[1]; continue;
       }

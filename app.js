@@ -8,6 +8,7 @@
     no: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"/></svg>',
     info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>',
     x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    zap: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>',
     chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
     voltar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>'
   };
@@ -40,9 +41,13 @@
     while (a.length < n) a.push(false);
     return a.slice(0, n);
   }
-  function setCheck(data, ex, n, i) {
-    var a = checks(data, ex, n); a[i] = !a[i];
-    E.checks[data][ex.id] = a; salvar(); return a[i];
+  function feitas(data, ex, n) { return checks(data, ex, n).filter(Boolean).length; }
+  /* Toque na série k: marca da 1 até a k. Tocar de novo na última marcada desmarca só ela. */
+  function marcarSerie(data, ex, n, k) {
+    var atual = feitas(data, ex, n), novo = (k === atual) ? k - 1 : k;
+    E.checks[data] = E.checks[data] || {};
+    E.checks[data][ex.id] = Array.from({ length: n }, function (_, i) { return i < novo; });
+    salvar(); return { antes: atual, depois: novo };
   }
   function feito(data, ex, n) { return checks(data, ex, n).every(Boolean); }
 
@@ -87,7 +92,7 @@
     h += '<div class="row"><button class="abre" data-abre="' + idx + '">' + img(ex) +
       '<div class="t"><h3>' + esc(ex.nome) + '</h3><p>' + meta + '</p></div></button>' +
       (ok ? '<div class="chk">' + IC.ok + '</div>' : '') + '</div>';
-    if (!ok || ex.Registro !== 'nada') {
+    {
       if (ex.Registro !== 'nada') {
         var hj = (regDe(ex.id).filter(function (x) { return x.d === data; })[0] || {}).v;
         var ant = TB.ultimoAntes(regDe(ex.id), data);
@@ -97,12 +102,17 @@
           '<p class="last">' + (ant ? 'Última vez: <b>' + num(ant.v) + ' ' + un + '</b>' : 'Primeira vez') +
           (ex.Registro === 'ajuda' ? '<br>Menos ajuda = mais forte' : '') + '</p></div>';
       }
-      h += '<div class="sets">';
-      for (var i = 0; i < n; i++) {
-        h += '<button class="set' + (a[i] ? ' ok' : '') + (n === 1 ? ' um' : '') + '" data-set="' + idx + ':' + i + '" aria-pressed="' + a[i] + '">' +
-          (n === 1 ? (a[i] ? 'Feito' : 'Marcar como feito') : (i + 1)) + '</button>';
+      if (n === 1) {
+        h += '<div class="acoes"><span></span><button class="marca' + (ok ? ' ok' : '') + '" data-set="' + idx + ':1" aria-pressed="' + ok + '"><span class="bolinha">' +
+          (ok ? IC.ok : '') + '</span>' + (ok ? 'Feito' : 'Marcar como feito') + '</button></div>';
+      } else {
+        var k = a.filter(Boolean).length;
+        h += '<div class="series"><span>Séries</span><div class="pills">';
+        for (var i = 1; i <= n; i++) {
+          h += '<button class="pill' + (i <= k ? ' ok' : '') + '" data-set="' + idx + ':' + i + '" aria-label="Série ' + i + (i <= k ? ', feita' : '') + '">' + (i <= k ? IC.ok : i) + '</button>';
+        }
+        h += '</div></div>';
       }
-      h += '</div>';
     }
     if (/tiros/i.test(ex.nome)) h += zona([[0, 114, ''], [114, 133, 'Leve ≤133', 'calm'], [133, 162, ''], [162, FCMAX, 'Tiro 162–180', 'hot']], [133, 162]);
     if (/z2/i.test(ex.nome)) h += zona([[100, 114, ''], [114, 133, 'Z2 114–133', 'calm'], [133, FCMAX, '']], [114, 133]);
@@ -139,9 +149,8 @@
     // Mobilidade
     var mob = T.mobilidade.blocos[0].itens, mf = mob.filter(function (ex) { return feito(d, ex, TB.numSeries(T, ex, d, true)); }).length;
     html += '<section class="sec"><div class="card' + (mf === mob.length ? ' done' : '') + '"><div class="row">' +
-      (mf === mob.length ? '<div class="chk">' + IC.ok + '</div>' : '') +
       '<div class="t"><h3>1. Mobilidade</h3><p>' + mf + ' de ' + mob.length + ' · ~20 min</p></div>' +
-      (mf < mob.length ? '<button class="btn pri sm" data-guia="1">' + (mf ? 'Continuar' : 'Fazer guiada') + '</button>' : '') + '</div>' +
+      (mf < mob.length ? '<button class="btn pri sm" data-guia="1">' + (mf ? 'Continuar' : 'Fazer guiada') + '</button>' : '<div class="chk">' + IC.ok + '</div>') + '</div>' +
       '<div class="acoes"><button class="lnk" data-mob="1">' + (V.abertoMob ? 'Fechar lista' : 'Ver a lista') + '</button>' +
       '<button class="marca' + (mf === mob.length ? ' ok' : '') + '" data-mobfeita="1" aria-pressed="' + (mf === mob.length) + '"><span class="bolinha">' +
       (mf === mob.length ? IC.ok : '') + '</span>' + (mf === mob.length ? 'Feita' : 'Marcar como feita') + '</button></div></div>';
@@ -230,69 +239,40 @@
     } catch (e) {}
   }
 
-  /* ---------- mobilidade guiada ---------- */
+  /* ---------- mobilidade guiada (simples: o tempo ele acompanha no relógio) ---------- */
   var G = null;
   function abrirGuia() {
     var mob = T.mobilidade.blocos[0].itens, d = V.dia, i = 0;
     while (i < mob.length - 1 && feito(d, mob[i], TB.numSeries(T, mob[i], d, true))) i++;
-    G = { i: i, lado: 0, resta: null, rodando: false, int: null };
-    desenharGuia();
+    G = { i: i }; desenharGuia();
   }
   function desenharGuia() {
-    var mob = T.mobilidade.blocos[0].itens, ex = mob[G.i], d = V.dia, tg = TB.tempoGuiado(ex);
-    if (tg && G.resta === null) G.resta = tg.s;
+    var mob = T.mobilidade.blocos[0].itens, ex = mob[G.i], d = V.dia, tempo = TB.tempoGuiado(ex);
     var segs = mob.map(function (m, k) { return '<i class="' + (k === G.i ? 'c' : feito(d, m, TB.numSeries(T, m, d, true)) ? 'd' : '') + '"></i>'; }).join('');
     var h = '<div class="guia" role="dialog" aria-modal="true" aria-label="Mobilidade guiada"><div><div class="gtop"><button class="icon" data-gfechar="1" aria-label="Fechar">' + IC.x + '</button>' +
       '<b style="font-size:14px">Mobilidade · ' + (G.i + 1) + ' de ' + mob.length + '</b><span style="width:44px"></span></div>' +
       '<div class="segs" style="grid-template-columns:repeat(' + mob.length + ',1fr)">' + segs + '</div>' +
       '<div style="padding:0 16px">' + img(ex, 'big') + '</div>' +
-      '<div style="padding:16px 20px 0;text-align:center"><h1 style="font-size:24px;letter-spacing:-.4px">' + esc(ex.nome) + '</h1></div>';
-    if (tg) {
-      var C = 2 * Math.PI * 78, fr = G.resta / tg.s;
-      if (tg.lados === 2) h += '<div class="side"><span class="' + (G.lado === 0 ? 'on' : '') + '">Primeiro lado' + (G.lado > 0 ? ' ✓' : '') + '</span><span class="' + (G.lado === 1 ? 'on' : '') + '">Segundo lado</span></div>';
-      h += '<div class="ring"><svg viewBox="0 0 180 180"><circle cx="90" cy="90" r="78" fill="none" stroke="#E3E0D8" stroke-width="11"/>' +
-        '<circle cx="90" cy="90" r="78" fill="none" stroke="#1F6F50" stroke-width="11" stroke-linecap="round" stroke-dasharray="' + C.toFixed(1) +
-        '" stroke-dashoffset="' + (C * (1 - fr)).toFixed(1) + '"/></svg><div class="in"><div><b>' + Math.floor(G.resta / 60) + ':' +
-        String(G.resta % 60).padStart(2, '0') + '</b><br><span>de ' + Math.floor(tg.s / 60) + ':' + String(tg.s % 60).padStart(2, '0') + '</span></div></div></div>';
-    } else {
-      h += '<p class="dose-g">' + esc(ex.Dose) + '</p>';
-    }
-    h += '<ol class="steps" style="padding:12px 20px 0">' + ex.passos.map(function (p) { return '<li>' + md(p) + '</li>'; }).join('') + '</ol>';
+      '<div style="padding:16px 20px 0;text-align:center"><h1 style="font-size:24px;letter-spacing:-.4px">' + esc(ex.nome) + '</h1></div>' +
+      '<p class="dose-g">' + esc(ex.Dose) + '</p>' +
+      (tempo ? '<p class="nota" style="text-align:center;margin:0 20px">Acompanhe o tempo no seu relógio.</p>' : '') +
+      '<ol class="steps" style="padding:14px 20px 0">' + ex.passos.map(function (p) { return '<li>' + md(p) + '</li>'; }).join('') + '</ol>';
     if (ex['Atenção']) h += '<p class="note" style="margin:10px 20px 0">' + md(cap(ex['Atenção'])) + '</p>';
-    var meio = tg ? (G.rodando ? 'Pausar' : (G.resta === tg.s && G.lado === 0 ? 'Começar' : 'Continuar')) : 'Feito';
     h += '</div><div class="ctrl"><button class="btn sec2" data-g="voltar"' + (G.i === 0 ? ' disabled' : '') + '>Voltar</button>' +
-      '<button class="btn pri" data-g="meio">' + meio + '</button><button class="btn sec2" data-g="pular">Pular</button></div></div>';
+      '<button class="btn pri" data-g="feito">Feito</button><button class="btn sec2" data-g="pular">Pular</button></div></div>';
     $cam.innerHTML = h;
+    var g = document.querySelector('.guia'); if (g) g.scrollTop = 0;
   }
-  function guiaConcluirItem() {
-    var mob = T.mobilidade.blocos[0].itens, ex = mob[G.i], n = TB.numSeries(T, ex, V.dia, true);
+  function guiaIr(i) {
+    if (i >= T.mobilidade.blocos[0].itens.length) { fecharGuia(); return; }
+    G.i = Math.max(0, i); desenharGuia();
+  }
+  function guiaFeito() {
+    var ex = T.mobilidade.blocos[0].itens[G.i], n = TB.numSeries(T, ex, V.dia, true);
     E.checks[V.dia] = E.checks[V.dia] || {}; E.checks[V.dia][ex.id] = Array(n).fill(true); salvar();
     guiaIr(G.i + 1);
   }
-  function guiaIr(i) {
-    clearInterval(G.int); G.rodando = false; G.lado = 0; G.resta = null;
-    var mob = T.mobilidade.blocos[0].itens;
-    if (i >= mob.length) { fecharGuia(); return; }
-    G.i = Math.max(0, i); desenharGuia();
-  }
-  function guiaMeio() {
-    var ex = T.mobilidade.blocos[0].itens[G.i], tg = TB.tempoGuiado(ex);
-    if (!tg) { guiaConcluirItem(); return; }
-    if (G.rodando) { clearInterval(G.int); G.rodando = false; desenharGuia(); return; }
-    G.rodando = true;
-    var fim = Date.now() + G.resta * 1000;
-    G.int = setInterval(function () {
-      G.resta = Math.max(0, Math.round((fim - Date.now()) / 1000));
-      if (G.resta === 0) {
-        clearInterval(G.int); bip();
-        if (tg.lados === 2 && G.lado === 0) { G.lado = 1; G.resta = tg.s; G.rodando = false; desenharGuia(); return; }
-        guiaConcluirItem(); return;
-      }
-      desenharGuia();
-    }, 250);
-    desenharGuia();
-  }
-  function fecharGuia() { if (G) clearInterval(G.int); G = null; $cam.innerHTML = ''; render(); }
+  function fecharGuia() { G = null; $cam.innerHTML = ''; render(); }
 
   /* ---------- perfil ---------- */
   function desenharPerfil() {
@@ -364,7 +344,8 @@
 
   /* ---------- orientações ---------- */
   function telaOrient() {
-    $app.innerHTML = '<div class="back"><button class="icon" data-ir="hoje" aria-label="Voltar">' + IC.voltar + '</button><b>Orientações</b></div>' +
+    $app.innerHTML = '<div class="back"><button class="icon" data-ir="hoje" aria-label="Voltar">' + IC.voltar + '</button><b>Orientações</b>' +
+      (T.whatsapp ? '<a class="zap" href="https://wa.me/' + T.whatsapp + '" target="_blank" rel="noopener">' + IC.zap + 'Falar com o JP</a>' : '') + '</div>' +
       '<section class="sec"><div class="card pad"><ul class="orient">' + T.orientacoes.map(function (o) { return '<li>' + md(o) + '</li>'; }).join('') + '</ul></div></section>';
   }
 
@@ -392,18 +373,24 @@
     }
     if (ds.cancelarpeso) { V.editPeso = false; desenharPerfil(); return; }
     if (ds.set) {
-      var p = ds.set.split(':'), it = LISTA[+p[0]], n = TB.numSeries(T, it.ex, V.dia, it.mob), on = setCheck(V.dia, it.ex, n, +p[1]);
+      var p = ds.set.split(':'), it = LISTA[+p[0]], n = TB.numSeries(T, it.ex, V.dia, it.mob), r = marcarSerie(V.dia, it.ex, n, +p[1]);
       var seg = TB.descansoSeg(it.ex);
-      if (on && seg && V.dia === hoje() && !feito(V.dia, it.ex, n)) descanso(seg);
+      if (r.depois > r.antes && r.depois < n && seg && V.dia === hoje()) descanso(seg);
       render(); return;
     }
     if (ds.pular) { clearInterval(timer); var dk = document.getElementById('dock'); if (dk) dk.remove(); return; }
-    if (ds.concluir) { if (ds.concluir === '1') E.dias[V.dia] = true; else delete E.dias[V.dia]; salvar(); render(); return; }
+    if (ds.concluir) {
+      if (ds.concluir === '1') {
+        E.dias[V.dia] = true; E.checks[V.dia] = E.checks[V.dia] || {};
+        itensDoDia(V.dia).forEach(function (x) { E.checks[V.dia][x.ex.id] = Array(TB.numSeries(T, x.ex, V.dia, x.mob)).fill(true); });
+      } else delete E.dias[V.dia];
+      salvar(); render(); return;
+    }
     if (ds.guia) { abrirGuia(); return; }
     if (ds.gfechar) { fecharGuia(); return; }
     if (ds.g === 'voltar') { guiaIr(G.i - 1); return; }
     if (ds.g === 'pular') { guiaIr(G.i + 1); return; }
-    if (ds.g === 'meio') { guiaMeio(); return; }
+    if (ds.g === 'feito') { guiaFeito(); return; }
     if (ds.toggle) { if (E.dias[ds.toggle]) delete E.dias[ds.toggle]; else E.dias[ds.toggle] = true; salvar(); render(); return; }
     if (ds.peso) { V.editPeso = true; desenharPerfil(); return; }
     if (ds.salvarpeso) {
@@ -418,7 +405,7 @@
       if (!(pe > 20 && pe < 300) || !(al > 1 && al < 2.5) || !/^\d{4}-\d{2}-\d{2}$/.test(na)) { alert('Confira os três campos.'); return; }
       E.perfil = { altura: al, nasc: na }; E.peso = [{ d: hoje(), kg: pe }]; salvar(); render(); return;
     }
-    if (ds.enviar) { location.href = 'https://wa.me/?text=' + encodeURIComponent(TB.resumo(T, E, hoje())); return; }
+    if (ds.enviar) { location.href = 'https://wa.me/' + (T.whatsapp || '') + '?text=' + encodeURIComponent(TB.resumo(T, E, hoje())); return; }
   });
   document.addEventListener('change', function (e) {
     var i = e.target.dataset && e.target.dataset.reg; if (i === undefined) return;
