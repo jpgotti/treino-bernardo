@@ -1,35 +1,28 @@
-# Refazer: imagens reprovadas na revisão
+# Refazer: só a prancha lateral (3ª tentativa)
 
 Mesmas regras de `img/BRIEFING.md` (estilo, formato 3:2 1536 × 1024, fundo `#F4F2ED`, sunga cinza-clara, só músculo
-superficial, figura dentro do quadrado central, sem texto). Use `img/stiff-unilateral.png` como modelo de estilo.
-Uma por vez, salvando cada uma assim que ficar pronta, sobrescrevendo o arquivo. Ao terminar, apague a linha
-correspondente de `img/PENDENCIAS.md`.
+superficial, figura dentro do quadrado central, sem texto). Modelo de estilo: `img/stiff-unilateral.png`.
+Salvar em `img/prancha-lateral.png`, sobrescrevendo. Não mexer em nenhuma outra imagem.
 
-## 1. `dorsiflexao.png` — o exercício mudou
+## O que deu errado nas duas tentativas
 
-Mobilização de tornozelo na parede, **sem halter, sem banco**. De frente para uma parede, as duas mãos apoiadas nela
-na altura do peito. Um pé à frente, com a ponta do pé a um palmo (uns 10 cm) da parede; o joelho da frente avança
-até encostar na parede, com o **calcanhar da frente inteiro no chão**. A outra perna fica atrás, esticada, calcanhar
-pode estar levantado. Vista de lado, para o ângulo do tornozelo ficar legível.
-Destaque: panturrilha (gastrocnêmio e sóleo) da perna da frente.
+As duas mostraram o boneco **deitado de lado com a coxa encostada no chão** — isso é descanso, não prancha. Na
+segunda, o antebraço e os joelhos dobrados já estavam certos; falta só o quadril subir.
 
-## 2. `prancha-lateral.png`
+## Como tem de ficar
 
-Prancha lateral de iniciante. Deitado de lado, apoio no **antebraço** (não na mão) com o **cotovelo exatamente
-embaixo do ombro**, antebraço apontando para a frente. **Joelhos dobrados a 90°**, pernas uma sobre a outra, pés para
-trás. **Quadril elevado**: cabeça, tronco, quadril e joelhos formam uma linha reta, sem o quadril cair. Mão de cima na
-cintura. Vista de frente, levemente de cima.
-Destaque: oblíquos do lado de cima.
+Prancha lateral de iniciante (apoio nos joelhos), na posição sustentada:
 
-## 3. `flexao-braco.png` — o gerador bloqueou duas vezes
+- **Só dois pontos tocam o chão**: o antebraço de baixo e a lateral do joelho de baixo. Nada mais encosta no chão:
+  nem quadril, nem coxa, nem tronco.
+- Antebraço no chão apontando para a frente, **cotovelo exatamente embaixo do ombro**, braço de apoio vertical.
+- Joelhos dobrados a 90°, um sobre o outro, canelas e pés para trás do corpo.
+- **Quadril levantado**, uns 20 a 25 cm acima do chão: cabeça, ombro, quadril e joelho formam **uma linha reta
+  diagonal**, subindo do joelho até a cabeça. Entre a coxa e o chão aparece um vão triangular de fundo.
+- Mão de cima apoiada na cintura. Olhar para a frente.
+- **Vista de frente** (a câmera de frente para o peito e a barriga do boneco), um pouco de cima, para o vão entre o
+  quadril e o chão ficar evidente.
+- Destaque: oblíquos do lado de cima.
 
-Descreva como ilustração de livro didático de educação física: "ilustração anatômica didática, boneco anatômico em
-posição de flexão de braço no solo". Mãos no chão um pouco mais abertas que os ombros, corpo reto da cabeça aos
-calcanhares, **cotovelos dobrados a uns 45° do tronco, peito a poucos centímetros do chão**. Vista lateral três-quartos.
-Mesma sunga cinza-clara das outras. Se bloquear de novo, tente vista lateral pura e anote em `PENDENCIAS.md`.
-Destaque: peitoral maior e tríceps.
-
-## 4. `icone.png` — se ainda não fez
-
-Ver o pedido do ícone (3 opções, `icone-a.png`, `icone-b.png`, `icone-c.png`) que já foi enviado em outra conversa; se
-ele já existe na pasta, ignore este item.
+Antes de salvar, confira: existe espaço vazio entre o quadril e o chão? Se a coxa ou o quadril estiverem encostados,
+refaça. Se depois de 3 tentativas não sair, anote em `img/PENDENCIAS.md`.

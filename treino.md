@@ -15,7 +15,7 @@ Início: segunda, 16/11/2026. Troca de bloco prevista para meados de janeiro (~8
 ## Orientações gerais
 
 - **Ordem:** sempre a mobilidade primeiro, depois o treino, na ordem da tela.
-- **Descanso:** o tempo de cada exercício está no card. O cronômetro começa sozinho quando você marca a série.
+- **Descanso:** o tempo de cada exercício está no card. Use o relógio para contar.
 - **Peso certo:** escolha uma carga em que a última repetição seja difícil, mas em que ainda sobrariam 2 ou 3. Não vá até não aguentar mais. A única exceção é a flexão de braço no fim da quarta.
 - **Quando aumentar:** fez o número máximo de repetições em todas as séries? Na semana seguinte, aumente um pouco a carga.
 - **Semanas 1 e 2:** faça uma série a menos em todo exercício que tem 3 ou mais. É o tempo de o corpo se acostumar.

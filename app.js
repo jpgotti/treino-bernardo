@@ -221,35 +221,6 @@
     return g + '</svg>';
   }
 
-  /* ---------- descanso ---------- */
-  var timer = null;
-  function descanso(seg) {
-    clearInterval(timer);
-    var fim = Date.now() + seg * 1000, el = document.getElementById('dock');
-    if (!el) { el = document.createElement('div'); el.id = 'dock'; document.body.appendChild(el); }
-    function tick() {
-      var r = Math.max(0, Math.round((fim - Date.now()) / 1000));
-      if (r === 0) {
-        clearInterval(timer); bip();
-        el.className = 'dock fim';
-        el.innerHTML = '<div><div class="lbl">Descanso</div><div class="tm">Pode ir</div></div><div class="db"></div><button class="btn ghost" data-pular="1">Ok</button>';
-        setTimeout(function () { if (el.className === 'dock fim') el.remove(); }, 5000);
-        return;
-      }
-      el.className = 'dock';
-      el.innerHTML = '<div><div class="lbl">Descanso</div><div class="tm">' + Math.floor(r / 60) + ':' + String(r % 60).padStart(2, '0') + '</div></div>' +
-        '<div class="db"><span style="width:' + (100 - 100 * r / seg).toFixed(0) + '%"></span></div><button class="btn ghost" data-pular="1">Pular</button>';
-    }
-    tick(); timer = setInterval(tick, 250);
-  }
-  function bip() {
-    try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch (e) {}
-    try {
-      var c = new (window.AudioContext || window.webkitAudioContext)(), o = c.createOscillator(), g = c.createGain();
-      o.frequency.value = 880; g.gain.value = .08; o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime + .25);
-    } catch (e) {}
-  }
-
   /* ---------- mobilidade guiada (simples: o tempo ele acompanha no relógio) ---------- */
   var G = null;
   function abrirGuia() {
@@ -286,13 +257,8 @@
   function fecharGuia() { G = null; $cam.innerHTML = ''; render(); }
 
   /* ---------- perfil ---------- */
-  function desenharPerfil() {
-    var velha = document.querySelector('.sheet.perfil'), sc = velha ? velha.scrollTop : 0;
-    $cam.innerHTML = '<div class="scrim" data-fecharperfil="1"></div><div class="sheet perfil" role="dialog" aria-modal="true" aria-label="Perfil">' +
-      '<div class="sheet-top"><div class="grab"></div><div class="row" style="justify-content:space-between"><b style="font-size:17px">Perfil</b>' +
-      '<button class="icon" data-fecharperfil="1" aria-label="Fechar">' + IC.x + '</button></div></div>' + telaPerfil() + '</div>';
-    var nova = document.querySelector('.sheet.perfil'); if (nova) nova.scrollTop = sc;
-    var f = document.getElementById('f-np'); if (f) f.focus();
+  function paginaPerfil() {
+    $app.innerHTML = '<div class="back"><button class="icon" data-ir="hoje" aria-label="Voltar">' + IC.voltar + '</button><b>Perfil</b></div>' + telaPerfil();
   }
   function telaPerfil() {
     var h = hoje(), html = '', nomeP = T.titulo.replace(/^Treino d[oa] /, '');
@@ -347,35 +313,30 @@
   }
 
   function render() {
-    if (V.tela === 'orient') telaOrient(); else telaHoje();
-    if (V.perfil) desenharPerfil();
+    if (V.tela === 'orient') telaOrient(); else if (V.tela === 'perfil') paginaPerfil(); else telaHoje();
   }
 
   /* ---------- eventos ---------- */
   document.addEventListener('click', function (e) {
-    var b = e.target.closest('button,[data-fechar],[data-fecharperfil],summary'); if (!b) return;
+    var b = e.target.closest('button,[data-fechar],summary'); if (!b) return;
     var ds = b.dataset;
     if (ds.ir) { V.tela = ds.ir; render(); scrollTo(0, 0); return; }
     if (ds.dia) { V.dia = ds.dia; render(); return; }
     if (ds.mob) { V.abertoMob = !V.abertoMob; render(); return; }
     if (ds.abre) { abrirDetalhe(LISTA[+ds.abre]); return; }
     if (ds.fechar) { $cam.innerHTML = ''; return; }
-    if (ds.perfil) { V.perfil = true; desenharPerfil(); return; }
-    if (ds.fecharperfil) { V.perfil = false; V.editPeso = false; $cam.innerHTML = ''; return; }
+    if (ds.perfil) { V.tela = 'perfil'; render(); scrollTo(0, 0); return; }
     if (ds.mobfeita) {
       var mob = T.mobilidade.blocos[0].itens, todos = mob.every(function (x) { return feito(V.dia, x, TB.numSeries(T, x, V.dia, true)); });
       E.checks[V.dia] = E.checks[V.dia] || {};
       mob.forEach(function (x) { E.checks[V.dia][x.id] = Array(TB.numSeries(T, x, V.dia, true)).fill(!todos); });
       salvar(); render(); return;
     }
-    if (ds.cancelarpeso) { V.editPeso = false; desenharPerfil(); return; }
     if (ds.set) {
-      var p = ds.set.split(':'), it = LISTA[+p[0]], n = TB.numSeries(T, it.ex, V.dia, it.mob), r = marcarSerie(V.dia, it.ex, n, +p[1]);
-      var seg = TB.descansoSeg(it.ex);
-      if (r.depois > r.antes && r.depois < n && seg && V.dia === hoje()) descanso(seg);
+      var p = ds.set.split(':'), it = LISTA[+p[0]];
+      marcarSerie(V.dia, it.ex, TB.numSeries(T, it.ex, V.dia, it.mob), +p[1]);
       render(); return;
     }
-    if (ds.pular) { clearInterval(timer); var dk = document.getElementById('dock'); if (dk) dk.remove(); return; }
     if (ds.concluir) { marcarDia(V.dia, ds.concluir === '1'); render(); return; }
     if (ds.guia) { abrirGuia(); return; }
     if (ds.gfechar) { fecharGuia(); return; }
@@ -383,13 +344,6 @@
     if (ds.g === 'pular') { guiaIr(G.i + 1); return; }
     if (ds.g === 'feito') { guiaFeito(); return; }
     if (ds.toggle) { marcarDia(ds.toggle, !E.dias[ds.toggle]); render(); return; }
-    if (ds.peso) { V.editPeso = true; desenharPerfil(); return; }
-    if (ds.salvarpeso) {
-      var v = lerNum(document.getElementById('f-np').value);
-      if (!(v > 20 && v < 300)) { alert('Confira o peso: use só números, como 80,5.'); return; }
-      var hj = hoje(); E.peso = E.peso.filter(function (x) { return x.d !== hj; }); E.peso.push({ d: hj, kg: v });
-      E.peso.sort(function (a, c) { return a.d < c.d ? -1 : 1; }); V.editPeso = false; salvar(); render(); return;
-    }
     if (ds.enviar) { location.href = 'https://wa.me/' + (T.whatsapp || '') + '?text=' + encodeURIComponent(TB.resumo(T, E, hoje())); return; }
   });
   document.addEventListener('change', function (e) {
@@ -398,7 +352,7 @@
   });
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape' || !$cam.innerHTML) return;
-    if (G) fecharGuia(); else { V.perfil = false; V.editPeso = false; $cam.innerHTML = ''; }
+    if (G) fecharGuia(); else $cam.innerHTML = '';
   });
 
   /* Folha arrastável: puxar para baixo, com o conteúdo no topo, fecha. Vale para toda folha. */
@@ -421,7 +375,7 @@
     sh.style.transition = 'transform .2s ease';
     if (fecha) {
       sh.style.transform = 'translateY(100%)';
-      setTimeout(function () { V.perfil = false; V.editPeso = false; $cam.innerHTML = ''; }, 180);
+      setTimeout(function () { $cam.innerHTML = ''; }, 180);
     } else sh.style.transform = '';
   });
 
