@@ -191,6 +191,8 @@
         '<p>' + ({ carga: 'Carga', ajuda: 'Ajuda', tempo: 'Tempo' }[ex.Registro]) + ' em ' + un + ', por dia de treino.' +
         (ex.Registro === 'ajuda' ? ' A linha descendo é progresso.' : '') + '</p></div>';
     }
+    h += '<a class="google" href="https://www.google.com/search?q=' + encodeURIComponent(ex.nome + ' exercício') + '" target="_blank" rel="noopener">' +
+      '<span>Ficou em dúvida?<b>Pesquisar "' + esc(ex.nome) + '" no Google</b></span>' + IC.chev + '</a>';
     $cam.innerHTML = h + '</div>';
   }
 
@@ -284,32 +286,11 @@
     var f = document.getElementById('f-np'); if (f) f.focus();
   }
   function telaPerfil() {
-    var h = hoje(), p = E.perfil, html = '';
-    if (!p.altura || !p.nasc || !E.peso.length) {
-      html += '<section class="sec"><div class="card pad form"><h2 style="font-size:18px">Seus dados</h2>' +
-        '<p class="nota">Ficam só neste celular.</p>' +
-        '<label for="f-peso">Peso (kg)</label><input id="f-peso" inputmode="decimal" placeholder="ex.: 80">' +
-        '<label for="f-alt">Altura (m)</label><input id="f-alt" inputmode="decimal" placeholder="ex.: 1,80">' +
-        '<label for="f-nasc">Data de nascimento</label><input id="f-nasc" type="date">' +
-        '<button class="btn pri full" style="margin-top:20px" data-salvarperfil="1">Salvar</button></div></section>';
-    } else {
-    var p0 = E.peso[0], p1 = E.peso[E.peso.length - 1], dv = Math.round((p1.kg - p0.kg) * 10) / 10;
-    html += '<div class="id"><div class="av">' + esc(T.titulo.replace(/^.* /, '').charAt(0)) + '</div><div><h1 style="font-size:26px">' +
-      esc(T.titulo.replace(/^Treino d[oa] /, '')) + '</h1><p class="meta" style="margin:0">' + TB.idade(p.nasc, h) + ' anos · treinando desde ' + TB.dataCurta(T.inicio) + '</p></div></div>';
-    html += '<section class="sec"><div class="card pad"><div class="wt"><div><small>Peso atual · ' + TB.dataCurta(p1.d) + '</small><b>' + num(p1.kg) + ' kg</b></div>' +
-      (V.editPeso ? '' : '<button class="btn sec2" data-peso="1">Atualizar</button>') + '</div>' +
-      (V.editPeso ? '<div class="form novo-peso"><label for="f-np">Peso de hoje (kg)</label><input id="f-np" inputmode="decimal" placeholder="ex.: 80,5">' +
-        '<div class="two-btn"><button class="btn sec2" data-cancelarpeso="1">Cancelar</button><button class="btn pri" data-salvarpeso="1">Salvar</button></div></div>' : '') +
-      '<div class="wh"><div><small>Inicial · ' + TB.dataCurta(p0.d) + '</small><b>' + num(p0.kg) + ' kg</b></div><div><small>Variação</small><b style="color:var(--accent)">' +
-      (dv > 0 ? '+' : dv < 0 ? '−' : '') + num(Math.abs(dv)) + ' kg</b></div><div><small>Registros</small><b>' + E.peso.length + '</b></div></div>' +
-      (E.peso.length > 1 ? '<details class="hist"><summary class="lnk">Ver histórico</summary><ul>' + E.peso.slice().reverse().map(function (x) {
-        return '<li><span>' + TB.dataCurta(x.d) + '</span><b>' + num(x.kg) + ' kg</b></li>'; }).join('') + '</ul></details>' : '') + '</div>' +
-      '<div class="two"><div><small>Altura</small><b>' + num(p.altura) + ' m</b></div><div><small>Nascimento</small><b>' +
-      p.nasc.split('-').reverse().join('/') + '</b></div></div>';
+    var h = hoje(), html = '', nomeP = T.titulo.replace(/^Treino d[oa] /, '');
+    html += '<div class="id"><div class="av">' + esc(nomeP.charAt(0)) + '</div><div><h1 style="font-size:24px">' + esc(nomeP) +
+      '</h1><p class="meta" style="margin:0">Treinando desde ' + TB.dataCurta(T.inicio) + '</p></div></div><section class="sec">';
 
-    }
-
-    // Esta semana
+    // 1) Esta semana (o "Concluir treino" e o toque na bolinha marcam o mesmo registro)
     var seg = TB.segundaDe(h), strip = '';
     for (var k = 0; k < 7; k++) {
       var s = TB.somaDias(seg, k), st = TB.estadoDia(E.dias, s, h, T.inicio);
@@ -318,10 +299,10 @@
         '"><span>' + TB.CURTO_DIA[k + 1] + '</span><span class="dot ' + st + '">' + (st === 'f' || st === 's' ? IC.ok : st === 'x' ? IC.no : '') +
         '</span><span class="dt">' + +s.slice(8) + '</span></button>';
     }
-    var nd = TB.diaSemana(h);
-    html += '<div class="card pad" style="margin-top:20px"><div class="wkh"><h2>Esta semana</h2><span>Hoje é ' + TB.NOMES_DIA[nd].toLowerCase() + ', ' + TB.dataCurta(h) + '</span></div><div class="strip">' + strip + '</div></div>';
+    html += '<div class="card pad"><div class="wkh"><h2>Esta semana</h2><span>Hoje é ' + TB.NOMES_DIA[TB.diaSemana(h)].toLowerCase() + ', ' +
+      TB.dataCurta(h) + '</span></div><div class="strip">' + strip + '</div></div>';
 
-    // Frequência total
+    // 2) Frequência total
     var fq = TB.frequencia(T, E.dias, h), sems = fq.semanas.slice(-8), base = fq.semanas.length - sems.length;
     html += '<div class="sech" style="padding-top:20px"><h2>Frequência total</h2><span>' + fq.semanas.length + ' semana' + (fq.semanas.length > 1 ? 's' : '') +
       (fq.extras ? ' · ' + fq.extras + ' extra' + (fq.extras > 1 ? 's' : '') : '') + '</span></div>' +
@@ -336,8 +317,25 @@
     });
     html += '</div><div class="leg"><span><i class="dot f">' + IC.ok + '</i>Feito</span><span><i class="dot x">' + IC.no + '</i>Furou</span><span><i class="dot s">' +
       IC.ok + '</i>Extra</span><span><i class="dot h"></i>Hoje</span></div></div>' +
-      '<button class="btn pri full" style="margin-top:4px" data-enviar="1">Enviar resumo ao JP</button></section>';
-    return html;
+      '<button class="btn pri full" style="margin-top:4px" data-enviar="1">Enviar resumo ao JP</button>';
+
+    // 3) Peso, enxuto, no fim
+    var temPeso = E.peso.length > 0, editar = V.editPeso || !temPeso;
+    html += '<div class="card peso-linha">';
+    if (temPeso) {
+      var p0 = E.peso[0], p1 = E.peso[E.peso.length - 1], dv = Math.round((p1.kg - p0.kg) * 10) / 10;
+      html += '<div class="row"><div class="t"><small>Peso · ' + TB.dataCurta(p1.d) + '</small><b>' + num(p1.kg) + ' kg</b>' +
+        (E.peso.length > 1 ? '<span class="var">' + (dv > 0 ? '+' : dv < 0 ? '−' : '') + num(Math.abs(dv)) + ' kg desde ' + TB.dataCurta(p0.d) + '</span>' : '') +
+        '</div>' + (editar ? '' : '<button class="lnk" data-peso="1">Atualizar</button>') + '</div>';
+    }
+    if (editar) {
+      html += '<div class="form novo-peso' + (temPeso ? '' : ' primeiro') + '"><label for="f-np">' + (temPeso ? 'Peso de hoje (kg)' : 'Seu peso (kg) · fica só neste celular') +
+        '</label><div class="peso-in"><input id="f-np" inputmode="decimal" placeholder="ex.: 80,5">' +
+        (temPeso ? '<button class="btn sec2" data-cancelarpeso="1">Cancelar</button>' : '') + '<button class="btn pri" data-salvarpeso="1">Salvar</button></div></div>';
+    }
+    if (E.peso.length > 1) html += '<details class="hist"><summary class="lnk">Histórico de peso</summary><ul>' + E.peso.slice().reverse().map(function (x) {
+      return '<li><span>' + TB.dataCurta(x.d) + '</span><b>' + num(x.kg) + ' kg</b></li>'; }).join('') + '</ul></details>';
+    return html + '</div></section>';
   }
 
   function lerNum(v) { return parseFloat(String(v).replace(',', '.')); }
@@ -398,12 +396,6 @@
       if (!(v > 20 && v < 300)) { alert('Confira o peso: use só números, como 80,5.'); return; }
       var hj = hoje(); E.peso = E.peso.filter(function (x) { return x.d !== hj; }); E.peso.push({ d: hj, kg: v });
       E.peso.sort(function (a, c) { return a.d < c.d ? -1 : 1; }); V.editPeso = false; salvar(); render(); return;
-    }
-    if (ds.salvarperfil) {
-      var pe = lerNum(document.getElementById('f-peso').value), al = lerNum(document.getElementById('f-alt').value), na = document.getElementById('f-nasc').value;
-      if (al > 3) al = al / 100;
-      if (!(pe > 20 && pe < 300) || !(al > 1 && al < 2.5) || !/^\d{4}-\d{2}-\d{2}$/.test(na)) { alert('Confira os três campos.'); return; }
-      E.perfil = { altura: al, nasc: na }; E.peso = [{ d: hoje(), kg: pe }]; salvar(); render(); return;
     }
     if (ds.enviar) { location.href = 'https://wa.me/' + (T.whatsapp || '') + '?text=' + encodeURIComponent(TB.resumo(T, E, hoje())); return; }
   });

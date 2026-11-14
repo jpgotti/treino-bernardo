@@ -246,3 +246,20 @@ html,body{touch-action:manipulation}
 
 /* com a imagem carregada, some o listrado de "sem imagem" */
 .ph:has(img){background:var(--bg)}
+
+/* perfil: peso enxuto no fim */
+.peso-linha{margin-top:16px;padding:14px 16px}
+.peso-linha .t small{display:block;font-size:12.5px;color:var(--ink-3);font-weight:600}
+.peso-linha .t b{font-size:18px;font-weight:800;margin-right:8px}
+.peso-linha .var{font-size:12.5px;color:var(--ink-3);font-weight:600}
+.peso-linha .novo-peso.primeiro{margin-top:0;padding-top:0;border-top:0}
+.peso-in{display:flex;gap:8px}
+.peso-in input{flex:1}
+.peso-in .btn{flex:none}
+.peso-linha .hist{margin-top:8px}
+/* pesquisar no Google */
+.google{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:22px;padding:14px 16px;border-radius:var(--r);
+  background:var(--surface);border:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.google span{display:flex;flex-direction:column;font-size:12.5px;color:var(--ink-3);font-weight:600}
+.google b{font-size:14.5px;color:var(--ink);font-weight:700;margin-top:2px}
+.google svg{width:18px;height:18px;color:var(--ink-3);flex:none}
