@@ -9,7 +9,7 @@ Se o app não conseguir ler, ele mostra a linha com problema em vez de abrir pel
 
 # Treino do Bernardo
 
-WhatsApp do JP:
+WhatsApp do JP: 5521981329490
 Início: segunda, 16/11/2026. Troca de bloco prevista para meados de janeiro (~8 semanas).
 
 ## Orientações gerais
