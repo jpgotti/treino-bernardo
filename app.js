@@ -153,8 +153,8 @@
 
     if (d <= h) {
       html += '<div class="concluir">' + (E.dias[d]
-        ? '<button class="btn sec2 full" data-concluir="0">Treino concluído ✓ · desfazer</button>'
-        : '<button class="btn pri full" data-concluir="1">Concluir treino</button>') + '</div>';
+        ? '<button class="btn pri full" data-concluir="0" aria-pressed="true"><span class="bola">' + IC.ok + '</span>Treino concluído</button>'
+        : '<button class="btn sec2 full" data-concluir="1" aria-pressed="false">Concluir treino</button>') + '</div>';
     }
     $app.innerHTML = html;
   }
