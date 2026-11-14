@@ -263,3 +263,7 @@ html,body{touch-action:manipulation}
 .google span{display:flex;flex-direction:column;font-size:12.5px;color:var(--ink-3);font-weight:600}
 .google b{font-size:14.5px;color:var(--ink);font-weight:700;margin-top:2px}
 .google svg{width:18px;height:18px;color:var(--ink-3);flex:none}
+
+/* resposta ao toque: o botão reage quando o dedo encosta, não só quando levanta (vale para todo botão e link) */
+button:not(:disabled),a{transition:transform .08s ease,opacity .08s ease}
+button:not(:disabled):active,a:active{transform:scale(.97);opacity:.8}

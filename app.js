@@ -247,7 +247,7 @@
     var g = document.querySelector('.guia'); if (g) g.scrollTop = 0;
   }
   function guiaIr(i) {
-    if (i >= T.mobilidade.blocos[0].itens.length) { fecharGuia(); return; }
+    if (i >= T.mobilidade.blocos[0].itens.length) { sair(); return; }
     G.i = Math.max(0, i); desenharGuia();
   }
   function guiaFeito() {
@@ -256,6 +256,22 @@
     guiaIr(G.i + 1);
   }
   function fecharGuia() { G = null; $cam.innerHTML = ''; render(); }
+
+  /* ---------- voltar do celular ----------
+     Toda tela ou camada fora da tela Hoje (perfil, orientações, detalhe, mobilidade guiada) ganha uma
+     entrada no histórico. Assim o botão voltar do Android e o gesto de voltar fecham a camada em vez de
+     sair do app. Os botões de fechar da própria tela passam por sair(), que usa o mesmo caminho. */
+  var nivel = false;
+  function entrar() { if (!nivel) { history.pushState({ camada: 1 }, ''); nivel = true; } }
+  function sair() { if (nivel) history.back(); else fecharUm(); }
+  function fecharUm() {
+    nivel = false;
+    if (G) { fecharGuia(); return; }
+    if ($cam.innerHTML) { $cam.innerHTML = ''; return; }
+    if (V.tela !== 'hoje') { V.tela = 'hoje'; render(); scrollTo(0, 0); }
+  }
+  window.addEventListener('popstate', fecharUm);
+  if (history.state && history.state.camada) history.replaceState(null, '');
 
   /* ---------- perfil ---------- */
   function paginaPerfil() {
@@ -321,12 +337,13 @@
   document.addEventListener('click', function (e) {
     var b = e.target.closest('button,[data-fechar],summary'); if (!b) return;
     var ds = b.dataset;
-    if (ds.ir) { V.tela = ds.ir; render(); scrollTo(0, 0); return; }
+    if (ds.ir === 'hoje') { sair(); return; }
+    if (ds.ir) { entrar(); V.tela = ds.ir; render(); scrollTo(0, 0); return; }
     if (ds.dia) { V.dia = ds.dia; render(); return; }
     if (ds.mob) { V.abertoMob = !V.abertoMob; render(); return; }
-    if (ds.abre) { abrirDetalhe(LISTA[+ds.abre]); return; }
-    if (ds.fechar) { $cam.innerHTML = ''; return; }
-    if (ds.perfil) { V.tela = 'perfil'; render(); scrollTo(0, 0); return; }
+    if (ds.abre) { entrar(); abrirDetalhe(LISTA[+ds.abre]); return; }
+    if (ds.fechar) { sair(); return; }
+    if (ds.perfil) { entrar(); V.tela = 'perfil'; render(); scrollTo(0, 0); return; }
     if (ds.mobfeita) {
       var mob = T.mobilidade.blocos[0].itens, todos = mob.every(function (x) { return feito(V.dia, x, TB.numSeries(T, x, V.dia, true)); });
       E.checks[V.dia] = E.checks[V.dia] || {};
@@ -339,8 +356,8 @@
       render(); return;
     }
     if (ds.concluir) { marcarDia(V.dia, ds.concluir === '1'); render(); return; }
-    if (ds.guia) { abrirGuia(); return; }
-    if (ds.gfechar) { fecharGuia(); return; }
+    if (ds.guia) { entrar(); abrirGuia(); return; }
+    if (ds.gfechar) { sair(); return; }
     if (ds.g === 'voltar') { guiaIr(G.i - 1); return; }
     if (ds.g === 'pular') { guiaIr(G.i + 1); return; }
     if (ds.g === 'feito') { guiaFeito(); return; }
@@ -353,7 +370,7 @@
   });
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape' || !$cam.innerHTML) return;
-    if (G) fecharGuia(); else $cam.innerHTML = '';
+    sair();
   });
 
   /* Folha arrastável: puxar para baixo, com o conteúdo no topo, fecha. Vale para toda folha. */
@@ -376,7 +393,7 @@
     sh.style.transition = 'transform .2s ease';
     if (fecha) {
       sh.style.transform = 'translateY(100%)';
-      setTimeout(function () { $cam.innerHTML = ''; }, 180);
+      setTimeout(sair, 180);
     } else sh.style.transform = '';
   });
 
